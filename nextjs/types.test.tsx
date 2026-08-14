@@ -10,14 +10,14 @@ export const Assert = <T extends unknown, U extends T>() => {};
 
 export const test = () => {
   <WeekCalendar
-    events={[{ start: new Date(), data: { hello: 123 } }]}
+    events={[{ start: new Date(), end: new Date(), data: { hello: 123 } }]}
     onClickEvent={(event) => {
       event.data.hello;
       Assert<number, typeof event.data.hello>();
     }}
   />;
   <WeekCalendar
-    events={[{ start: new Date() }]}
+    events={[{ start: new Date(), end: new Date() }]}
     onClickEvent={(event) => {
       type keys = keyof typeof event;
       type ext = "data" extends keys ? "yes" : "no";
@@ -26,7 +26,7 @@ export const test = () => {
     }}
   />;
   <WeekCalendar
-    events={[{ start: new Date(), color: "red", data: 123 }]}
+    events={[{ start: new Date(), end: new Date(), color: "red", data: 123 }]}
     onClickEvent={(event) => {
       Assert<number, typeof event.data>;
     }}

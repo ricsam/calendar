@@ -35,10 +35,6 @@ import React from "react";
 import { minRenderedEventDuration } from "../events_to_rows";
 import {
   DEFAULT_COLOR,
-  getEventColor,
-  getEventEnd,
-  getEventStart,
-  isTask,
   mergeSx,
   tuple,
 } from "../helpers";
@@ -145,7 +141,7 @@ export type TimelineProps<T> = {
    * @param end when event ends
    * @returns void
    */
-  onCreateEvent?: (start: Date, end?: Date) => void;
+  onCreateEvent?: (start: Date, end: Date) => void;
 
   /**
    * Triggered when an event is moved
@@ -157,7 +153,7 @@ export type TimelineProps<T> = {
   onMoveEvent?: (
     event: CalendarEvent<T>,
     newStart: Date,
-    newEnd: Date | undefined
+    newEnd: Date
   ) => void;
 
   /**
@@ -400,8 +396,8 @@ export function Timeline<T>(props: TimelineProps<T>) {
       allRows: allRows.map((sourceRow) =>
         sourceRow.map((sourceEvent) => ({
           sourceEvent,
-          start: getEventStart(sourceEvent),
-          end: getEventEnd(sourceEvent),
+          start: sourceEvent.start,
+          end: sourceEvent.end,
         }))
       ),
       eventGroupMap,
@@ -442,11 +438,11 @@ export function Timeline<T>(props: TimelineProps<T>) {
       addedMs = Math.min(Math.max(addedMs, minAddedMs), maxAddedMs);
 
       let start = addMilliseconds(
-        getEventStart(dragged.event.sourceEvent),
+        dragged.event.sourceEvent.start,
         addedMs
       );
       let end = addMilliseconds(
-        getEventEnd(dragged.event.sourceEvent),
+        dragged.event.sourceEvent.end,
         addedMs
       );
 
@@ -948,12 +944,8 @@ const Row = React.memo(function Row<T>({
     >
       {row.map((event, evIndex) => {
         const dragged = draggedEvent?.source.sourceEvent === event.sourceEvent;
-        const { bg, color } = getEventColor(
-          now,
-          getEventEnd(event.sourceEvent),
-          theme,
-          event.sourceEvent.color ?? defaultEventColor
-        );
+        const bg = event.sourceEvent.styling?.bg ?? defaultEventColor ?? DEFAULT_COLOR;
+        const textColor = event.sourceEvent.styling?.textColor ?? theme.palette.text.primary;
         return (
           <RowEvent
             key={evIndex}
@@ -965,7 +957,7 @@ const Row = React.memo(function Row<T>({
             evIndex={evIndex}
             resolution={resolution}
             bg={bg}
-            color={color}
+            textColor={textColor}
           />
         );
       })}
@@ -982,7 +974,7 @@ const RowEvent = React.memo(function RowEvent<T>({
   evIndex,
   resolution,
   bg,
-  color,
+  textColor,
 }: {
   draggedEvent?: DraggedEvent<ModifiableEvent<T>>;
   event: ModifiableEvent<T>;
@@ -992,7 +984,7 @@ const RowEvent = React.memo(function RowEvent<T>({
   evIndex: number;
   resolution: TimelineResolution;
   bg: string;
-  color: string;
+  textColor: string;
 }) {
   let evStart = event.start;
   let evEnd = event.end;
@@ -1006,9 +998,8 @@ const RowEvent = React.memo(function RowEvent<T>({
       ...draggedEvent.dragged,
     };
 
-    newDragged.start = getEventStart(newDragged);
     newDragged.end = max([
-      getEventEnd(newDragged),
+      newDragged.end,
       addMilliseconds(newDragged.start, minRenderedEventDuration(resolution)),
     ]);
 
@@ -1104,20 +1095,19 @@ const RowEvent = React.memo(function RowEvent<T>({
               width: "100%",
             }}
           >
-            <Typography variant="event" style={{ color }}>
+            <Typography variant="event" style={{ color: textColor }}>
               {title}
             </Typography>
             {event.sourceEvent.endAdornment ? (
               <>
                 <Box sx={{ flex: 1 }}></Box>
-                <Box>{event.sourceEvent.endAdornment({ bg, color })}</Box>
+                <Box>{event.sourceEvent.endAdornment({ bg, textColor })}</Box>
               </>
             ) : null}
           </Box>
         </Box>
 
         {event.sourceEvent.canEdit &&
-          !isTask(event.sourceEvent) &&
           (["start", "end"] as const).map((pos, i) => (
             <Box
               key={i}
@@ -1207,15 +1197,15 @@ function parseEventsInTimeline<T>(
             start: timelineStart,
             end: timelineEnd,
           },
-          { start: getEventStart(event), end: getEventEnd(event) }
+          { start: event.start, end: event.end }
         );
       })
       .map((event) => {
         const { start, end } = constrainEvent(
           resolution,
           startTime,
-          getEventStart(event),
-          getEventEnd(event)
+          event.start,
+          event.end
         );
         return { sourceEvent: event.sourceEvent, start, end };
       })

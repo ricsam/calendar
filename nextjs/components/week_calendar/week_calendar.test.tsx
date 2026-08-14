@@ -13,6 +13,7 @@ test("all day event overlapping", () => {
         end: endOfDay(addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 1)),
         sourceEvent: {
           start: new Date(),
+          end: new Date(),
         },
       },
       {
@@ -20,6 +21,7 @@ test("all day event overlapping", () => {
         end: endOfDay(startOfWeek(new Date(), { weekStartsOn: 1 })),
         sourceEvent: {
           start: new Date(),
+          end: new Date(),
         },
       },
       {
@@ -27,6 +29,7 @@ test("all day event overlapping", () => {
         end: endOfDay(addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 2)),
         sourceEvent: {
           start: new Date(),
+          end: new Date(),
         },
       },
     ]

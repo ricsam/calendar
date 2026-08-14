@@ -4,6 +4,8 @@ import type { Meta, StoryObj } from "@storybook/react";
 import {
   addDays,
   addHours,
+  addMinutes,
+  endOfDay,
   endOfWeek,
   startOfDay,
   startOfHour,
@@ -180,17 +182,15 @@ export const WithSelectedEvents: Story = {
       ...manyEvents.slice(3),
       {
         start: startOfHour(new Date()),
-        end: startOfHour(new Date()),
-        title: "A task",
+        end: addMinutes(startOfHour(new Date()), 15),
+        title: "A short event",
         canEdit: true,
         selected: true,
       },
       {
-        start: addHours(
-          startOfDay(startOfWeek(new Date(), { weekStartsOn: 1 })),
-          2
-        ),
-        title: "A full day task",
+        start: startOfDay(startOfWeek(new Date(), { weekStartsOn: 1 })),
+        end: endOfDay(startOfWeek(new Date(), { weekStartsOn: 1 })),
+        title: "A full day event",
         selected: true,
       },
       {
@@ -198,11 +198,14 @@ export const WithSelectedEvents: Story = {
           startOfDay(startOfWeek(new Date(), { weekStartsOn: 1 })),
           2
         ),
-        end: addHours(
-          startOfDay(startOfWeek(new Date(), { weekStartsOn: 1 })),
-          2
+        end: addMinutes(
+          addHours(
+            startOfDay(startOfWeek(new Date(), { weekStartsOn: 1 })),
+            2
+          ),
+          15
         ),
-        title: "A sub day task",
+        title: "A sub day event",
         selected: true,
       },
     ],

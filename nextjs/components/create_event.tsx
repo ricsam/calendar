@@ -27,7 +27,6 @@ import type {} from "@mui/x-date-pickers/AdapterDateFnsV3"; // important for the
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { TimeField } from "@mui/x-date-pickers/TimeField";
 import {
-  addDays,
   addHours,
   addMilliseconds,
   addMinutes,
@@ -69,7 +68,7 @@ export function CreateEvent<T>({
   const setStart = (newStart: Date) => {
     onEdit({ ...event, start: newStart });
   };
-  const setEnd = (newEnd: Date | undefined) => {
+  const setEnd = (newEnd: Date) => {
     onEdit({ ...event, end: newEnd });
   };
 
@@ -106,7 +105,7 @@ export function CreateEvent<T>({
   const colors = [DEFAULT_COLOR, "#5C6BC0", "#EC407A", "#26A69A", "#EF5350"];
 
   const [eventColor, setEventColor] = React.useState(
-    event.color ?? defaultEventColor ?? DEFAULT_COLOR
+    event.styling?.bg ?? defaultEventColor ?? DEFAULT_COLOR
   );
 
   const unofficialColors = React.useRef<string[]>([]);
@@ -154,59 +153,6 @@ export function CreateEvent<T>({
             }}
           />
         </FlexRow>
-        <FlexRow pt={2} gap={2}>
-          <Box width={24} />
-          <FlexRow>
-            <Box width={72}>
-              <Button
-                size="small"
-                {...(!end || start.getTime() === end.getTime()
-                  ? { color: "inherit", variant: "text" }
-                  : { color: "primary", variant: "contained" })}
-                onClick={() => {
-                  if (!end || start.getTime() === end.getTime()) {
-                    setEnd(
-                      allDay
-                        ? addDays(startOfDay(start), 1)
-                        : addHours(start, 1)
-                    );
-                  }
-                }}
-              >
-                Event
-              </Button>
-            </Box>
-            <Box width={72}>
-              <Button
-                size="small"
-                {...(!end || start.getTime() === end.getTime()
-                  ? { color: "primary", variant: "contained" }
-                  : { color: "inherit", variant: "text" })}
-                onClick={() => {
-                  if (start.getTime() === startOfDay(start).getTime()) {
-                    const hours = getHours(addHours(new Date(), 1));
-                    const newStart = setHours(start, hours);
-                    setStart(newStart);
-                    if (!allDay) {
-                      setEnd(newStart);
-                    } else {
-                      setEnd(undefined);
-                    }
-                  } else {
-                    if (!allDay) {
-                      setEnd(start);
-                    } else {
-                      setEnd(undefined);
-                    }
-                  }
-                }}
-              >
-                Task
-              </Button>
-            </Box>
-          </FlexRow>
-        </FlexRow>
-
         <FlexRow pt={2} alignItems="center" gap={2}>
           <SvgIcon
             sx={{
@@ -231,93 +177,72 @@ export function CreateEvent<T>({
               </defs>
             </svg>
           </SvgIcon>
-          {end && start.getTime() !== end.getTime() ? (
-            allDay ? (
-              <>
-                <DatePicker
-                  value={start}
-                  onChange={(date): void => {
-                    if (date) {
-                      setStart(date);
-                      if (differenceInMilliseconds(end, date) < 0) {
-                        setEnd(endOfDay(date));
-                      }
-                    }
-                  }}
-                />
-                {"–"}
-                <DatePicker
-                  value={end}
-                  onChange={(date): void => {
-                    if (date) {
-                      if (differenceInMilliseconds(date, start) < 0) {
-                        setStart(date);
-                        setEnd(endOfDay(date));
-                      } else {
-                        setEnd(date);
-                      }
-                    }
-                  }}
-                />
-              </>
-            ) : (
-              <>
-                <DatePicker
-                  value={start}
-                  onChange={(date): void => {
-                    if (date) {
-                      if (!isSameDay(date, end)) {
-                        setEnd(
-                          addMilliseconds(
-                            date,
-                            differenceInMilliseconds(end, start)
-                          )
-                        );
-                      }
-                      setStart(date);
-                    }
-                  }}
-                />
-                <TimePicker
-                  startTime={startOfDay(start)}
-                  value={start}
-                  onChange={(newValue) => {
-                    if (newValue) {
-                      setStart(newValue);
-                    }
-                  }}
-                />
-                {"–"}
-                <TimePicker
-                  startTime={start}
-                  value={end}
-                  onChange={(newValue) => setEnd(newValue ?? undefined)}
-                  showDiff
-                />
-              </>
-            )
-          ) : (
+          {allDay ? (
             <>
               <DatePicker
                 value={start}
                 onChange={(date): void => {
                   if (date) {
                     setStart(date);
+                    if (differenceInMilliseconds(end, date) < 0) {
+                      setEnd(endOfDay(date));
+                    }
                   }
                 }}
               />
-              {start.getTime() === end?.getTime() ? (
-                <TimePicker
-                  startTime={startOfDay(start)}
-                  value={start}
-                  onChange={(newValue) => {
-                    if (newValue) {
-                      setStart(newValue);
-                      setEnd(newValue);
+              {"–"}
+              <DatePicker
+                value={end}
+                onChange={(date): void => {
+                  if (date) {
+                    if (differenceInMilliseconds(date, start) < 0) {
+                      setStart(date);
+                      setEnd(endOfDay(date));
+                    } else {
+                      setEnd(date);
                     }
-                  }}
-                />
-              ) : null}
+                  }
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <DatePicker
+                value={start}
+                onChange={(date): void => {
+                  if (date) {
+                    if (!isSameDay(date, end)) {
+                      setEnd(
+                        addMilliseconds(
+                          date,
+                          differenceInMilliseconds(end, start)
+                        )
+                      );
+                    }
+                    setStart(date);
+                  }
+                }}
+              />
+              <TimePicker
+                startTime={startOfDay(start)}
+                value={start}
+                onChange={(newValue) => {
+                  if (newValue) {
+                    setStart(newValue);
+                  }
+                }}
+              />
+              {"–"}
+              <TimePicker
+                startTime={start}
+                value={end}
+                onChange={(newValue) => {
+                  if (newValue) {
+                    setEnd(newValue);
+                  }
+                }}
+                showDiff
+              />
             </>
           )}
         </FlexRow>
@@ -330,21 +255,6 @@ export function CreateEvent<T>({
                 <Checkbox
                   checked={allDay}
                   onChange={(ev, checked) => {
-                    if (!end || start.getTime() === end.getTime()) {
-                      // it is a task
-                      if (!checked) {
-                        // it is not all day
-                        const hours = getHours(addHours(new Date(), 1));
-                        const newStart = setHours(start, hours);
-                        setStart(newStart);
-                        setEnd(newStart);
-                      } else {
-                        // it is all day
-                        setStart(startOfDay(start));
-                        setEnd(undefined);
-                      }
-                      return;
-                    }
                     if (!checked) {
                       if (start.getTime() === startOfDay(start).getTime()) {
                         // set the same hour as now
@@ -430,9 +340,9 @@ export function CreateEvent<T>({
             disabled={
               !draft &&
               start.getTime() === event.start.getTime() &&
-              end?.getTime() === event.end?.getTime() &&
+              end.getTime() === event.end.getTime() &&
               title === event.title &&
-              eventColor === (event.color ?? defaultEventColor ?? DEFAULT_COLOR)
+              eventColor === (event.styling?.bg ?? defaultEventColor ?? DEFAULT_COLOR)
             }
             onClick={() => {
               onSave(
@@ -441,7 +351,7 @@ export function CreateEvent<T>({
                   start,
                   end,
                   title,
-                  color: eventColor,
+                  styling: { ...event.styling, bg: eventColor },
                   canEdit: true,
                 },
                 event
@@ -597,11 +507,7 @@ function TimePicker(props: {
                 if (d >= 60) {
                   distance = `${d / 60} hr`;
                 } else {
-                  if (d === 0) {
-                    distance = "Task";
-                  } else {
-                    distance = `${d} mins`;
-                  }
+                  distance = `${d} mins`;
                 }
                 distance = ` (${distance})`;
               }

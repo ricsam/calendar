@@ -37,13 +37,13 @@ function eventGrid<T>(
   );
 }
 
-test("works with a task", () => {
+test("works with a short event", () => {
   expect(
     eventGrid(
       [
         {
           sourceEvent: {
-            title: "Task",
+            title: "Short event",
             start: subMinutes(new Date(), 30), // 14th 23:30
             end: subMinutes(new Date(), 15), // 14th 23:45
           },
@@ -70,7 +70,7 @@ test("works with a task", () => {
             "end": "2024-06-14 23:45",
             "index": 0,
             "start": "2024-06-14 23:30",
-            "title": "Task",
+            "title": "Short event",
           },
         ],
       ],
@@ -129,7 +129,7 @@ test("can populate the grid over multiple days", () => {
             title: "3 days event",
             start: startOfDay(addDays(new Date(), 2)), // 17th 00:00
             end: endOfDay(addDays(new Date(), 4)), // 19th 23:59
-            color: "pink",
+            styling: { color: "pink" },
           },
           start: startOfDay(addDays(new Date(), 2)), // 17th 00:00
           end: endOfDay(addDays(new Date(), 4)), // 19th 23:59
@@ -183,7 +183,7 @@ test("can populate the grid over multiple days", () => {
             title: "3 day event",
             start: startOfDay(addDays(new Date(), 1)), // 16th 00:00
             end: endOfDay(addDays(new Date(), 3)), // 18th 23:59
-            color: "pink",
+            styling: { color: "pink" },
           },
           start: startOfDay(addDays(new Date(), 1)), // 16th 00:00
           end: endOfDay(addDays(new Date(), 3)), // 18th 23:59
@@ -245,7 +245,7 @@ test("works with overlaps", () => {
             title: "3 day event",
             start: startOfDay(addDays(new Date(), 1)), // 16th 00:00
             end: endOfDay(addDays(new Date(), 3)), // 18th 23:59
-            color: "pink",
+            styling: { color: "pink" },
           },
           start: startOfDay(addDays(new Date(), 1)), // 16th 00:00
           end: endOfDay(addDays(new Date(), 3)), // 18th 23:59
@@ -255,7 +255,7 @@ test("works with overlaps", () => {
             title: "3 day event overlapping",
             start: startOfDay(addDays(new Date(), 2)), // 17th 00:00
             end: endOfDay(addDays(new Date(), 4)), // 19th 23:59
-            color: "pink",
+            styling: { color: "pink" },
           },
           start: startOfDay(addDays(new Date(), 2)), // 17th 00:00
           end: endOfDay(addDays(new Date(), 4)), // 19th 23:59
@@ -343,7 +343,7 @@ test("events are correct", () => {
             title: "3 day event",
             start: startOfDay(addDays(new Date(), 1)), // 16th 00:00
             end: endOfDay(addDays(new Date(), 3)), // 18th 23:59
-            color: "pink",
+            styling: { color: "pink" },
           },
           start: startOfDay(addDays(new Date(), 1)), // 16th 00:00
           end: endOfDay(addDays(new Date(), 3)), // 18th 23:59
@@ -389,7 +389,7 @@ test("eventProperties", () => {
             title: "3 day event",
             start: startOfDay(addDays(new Date(), 1)), // 16th 00:00
             end: endOfDay(addDays(new Date(), 3)), // 18th 23:59
-            color: "pink",
+            styling: { color: "pink" },
           },
           start: startOfDay(addDays(new Date(), 1)), // 16th 00:00
           end: endOfDay(addDays(new Date(), 3)), // 18th 23:59
@@ -399,7 +399,7 @@ test("eventProperties", () => {
             title: "3 day event overlapping",
             start: startOfDay(addDays(new Date(), 2)), // 17th 00:00
             end: endOfDay(addDays(new Date(), 4)), // 19th 23:59
-            color: "pink",
+            styling: { color: "pink" },
           },
           start: startOfDay(addDays(new Date(), 2)), // 17th 00:00
           end: endOfDay(addDays(new Date(), 4)), // 19th 23:59
@@ -447,7 +447,7 @@ test("some edge-case", () => {
         {
           sourceEvent: {
             start: startOfDay(addDays(new Date(), 5)),
-            color: "red",
+            styling: { color: "red" },
             title: "A",
             canEdit: true,
           },
@@ -461,7 +461,7 @@ test("some edge-case", () => {
             start: startOfDay(addDays(new Date(), 3)),
             end: endOfDay(addDays(new Date(), 4)),
             title: "B",
-            color: "green",
+            styling: { color: "green" },
             canEdit: true,
           },
         },
@@ -472,7 +472,7 @@ test("some edge-case", () => {
             start: startOfDay(addDays(new Date(), 4)),
             end: endOfDay(addDays(new Date(), 5)),
             title: "C",
-            color: "blue",
+            styling: { color: "blue" },
             canEdit: true,
           },
         },

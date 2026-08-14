@@ -14,23 +14,24 @@ import {
 export const manyEvents: CalendarEvent<undefined>[] = [
   {
     start: startOfDay(new Date()),
-    end: startOfDay(new Date()),
-    title: "A task",
+    end: addMinutes(startOfDay(new Date()), 15),
+    title: "A short event",
+  },
+  {
+    start: startOfDay(startOfWeek(new Date(), { weekStartsOn: 1 })),
+    end: endOfDay(startOfWeek(new Date(), { weekStartsOn: 1 })),
+    title: "A full day event",
   },
   {
     start: addHours(
       startOfDay(startOfWeek(new Date(), { weekStartsOn: 1 })),
       2
     ),
-    title: "A full day task",
-  },
-  {
-    start: addHours(
-      startOfDay(startOfWeek(new Date(), { weekStartsOn: 1 })),
-      2
+    end: addMinutes(
+      addHours(startOfDay(startOfWeek(new Date(), { weekStartsOn: 1 })), 2),
+      15
     ),
-    end: addHours(startOfDay(startOfWeek(new Date(), { weekStartsOn: 1 })), 2),
-    title: "A sub day task",
+    title: "A sub day event",
   },
   // 2 overlapping on monday
   {

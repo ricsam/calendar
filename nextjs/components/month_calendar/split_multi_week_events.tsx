@@ -10,7 +10,6 @@ import {
 import { StartDay } from "../types";
 import { ModifiableEvent } from "../week_calendar/types";
 import { monthCalendarRange } from "../event_grid";
-import { getEventEnd, getEventStart } from "../helpers";
 
 /**
  * Events that cross into a new week are split into two events or more.
@@ -29,8 +28,8 @@ export function splitMultiWeekEvents<T>(
   const weekStartsOn: StartOfWeekOptions["weekStartsOn"] =
     startDay === "monday" ? 1 : 0;
   const events: ModifiableEvent<T>[] = eventsInMonth.flatMap((defaultEvent) => {
-    const eventStart = getEventStart(defaultEvent);
-    const eventEnd = getEventEnd(defaultEvent);
+    const eventStart = defaultEvent.start;
+    const eventEnd = defaultEvent.end;
 
     const constrainedStart = max([eventStart, startOfMonthCalendar]);
     const constrainedEnd = min([eventEnd, endOfMonthCalendar]);

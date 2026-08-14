@@ -8,12 +8,12 @@ type RawContext<T> =
       workWeek: boolean;
       startOfWeek: Date;
       now: Date;
-      onCreateEvent?: (start: Date, end?: Date) => void;
+      onCreateEvent?: (start: Date, end: Date) => void;
       onClickEvent?: (event: CalendarEvent<T>, nativeEvent: MouseEvent) => void;
       onMoveEvent?: (
         event: CalendarEvent<T>,
         newStart: Date,
-        newEnd: Date | undefined
+        newEnd: Date,
       ) => void;
       defaultEventColor: string;
       scrollContainers: ScrollContainer[];

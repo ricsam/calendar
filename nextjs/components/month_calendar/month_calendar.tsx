@@ -36,9 +36,6 @@ import React, {
 import { MoreButton, eventGrid, monthCalendarRange } from "../event_grid";
 import {
   DEFAULT_COLOR,
-  getEventColor,
-  getEventEnd,
-  getEventStart,
   heightToPct,
   isAllDayEvent,
   mergeSx,
@@ -69,11 +66,11 @@ type RawContext<T> =
       startDay: StartDay;
       startOfMonth: Date;
       now: Date;
-      onCreateEvent?: (start: Date, end?: Date) => void;
+      onCreateEvent?: (start: Date, end: Date) => void;
       onMoveEvent?: (
         event: CalendarEvent<T>,
         newStart: Date,
-        newEnd: Date | undefined
+        newEnd: Date
       ) => void;
     };
 export const MonthCalendarConfigContext =
@@ -114,7 +111,7 @@ export type MonthCalendarProps<T> = {
    * @param end when event ends
    * @returns void
    */
-  onCreateEvent?: (start: Date, end?: Date) => void;
+  onCreateEvent?: (start: Date, end: Date) => void;
 
   /**
    * Triggered when an event is moved
@@ -126,7 +123,7 @@ export type MonthCalendarProps<T> = {
   onMoveEvent?: (
     event: CalendarEvent<T>,
     newStart: Date,
-    newEnd: Date | undefined
+    newEnd: Date
   ) => void;
 
   /**
@@ -174,8 +171,13 @@ function parseDefaultProps<T>(props: MonthCalendarProps<T>) {
 }
 
 export function MonthCalendar<T>(props: MonthCalendarProps<T>) {
-  const { startDay, now, startOfMonth, defaultEventColor, ...calendarProps } =
-    parseDefaultProps(props);
+  const {
+    startDay,
+    now,
+    startOfMonth,
+    defaultEventColor,
+    ...calendarProps
+  } = parseDefaultProps(props);
 
   const [allEvents, draggedEvent, setDraggedEvent] = useDragableEvents(
     calendarProps.events
@@ -280,8 +282,8 @@ export function MonthCalendar<T>(props: MonthCalendarProps<T>) {
       const height = yUnitToPx(120, weeksInMonth, container);
       const startWeek = getWeek(startOfMonth, { weekStartsOn });
 
-      let start = getEventStart(dragged.event.sourceEvent);
-      let end = getEventEnd(dragged.event.sourceEvent);
+      let start = dragged.event.sourceEvent.start;
+      let end = dragged.event.sourceEvent.end;
       if (addedDays !== 0) {
         start = addDays(start, addedDays);
         end = addDays(end, addedDays);
@@ -615,8 +617,8 @@ export function MonthCalendar<T>(props: MonthCalendarProps<T>) {
                               color: active
                                 ? (theme) => theme.palette.primary.contrastText
                                 : isInCurrentMonth
-                                ? (theme) => theme.palette.text.primary
-                                : (theme) => theme.palette.text.secondary,
+                                  ? (theme) => theme.palette.text.primary
+                                  : (theme) => theme.palette.text.secondary,
                             }}
                           >
                             {dayNumber}
@@ -683,11 +685,11 @@ export function MonthCalendar<T>(props: MonthCalendarProps<T>) {
                       const { week, day, row } = eventProperties[`${index}`];
 
                       const eventStart = max([
-                        getEventStart(event),
+                        event.start,
                         startOfMonthCalendar,
                       ]);
                       const eventEnd = min([
-                        getEventEnd(event),
+                        event.end,
                         endOfMonthCalendar,
                       ]);
 
@@ -731,10 +733,10 @@ export function MonthCalendar<T>(props: MonthCalendarProps<T>) {
                         triangleLeft && triangleRight
                           ? "both"
                           : triangleRight
-                          ? "right"
-                          : triangleLeft
-                          ? "left"
-                          : undefined;
+                            ? "right"
+                            : triangleLeft
+                              ? "left"
+                              : undefined;
 
                       const disableInteractive =
                         !calendarProps.onClickEvent &&
@@ -745,12 +747,8 @@ export function MonthCalendar<T>(props: MonthCalendarProps<T>) {
                           draggedEvent.source.sourceEvent ===
                             event.sourceEvent);
 
-                      const { bg, color } = getEventColor(
-                        now,
-                        getEventEnd(event.sourceEvent),
-                        theme,
-                        event.sourceEvent.color ?? defaultEventColor
-                      );
+                      const bg = event.sourceEvent.styling?.bg ?? defaultEventColor ?? DEFAULT_COLOR;
+                      const textColor = event.sourceEvent.styling?.textColor ?? theme.palette.text.primary;
 
                       const props: React.ComponentPropsWithoutRef<
                         typeof MonthCalendarEvent
@@ -759,7 +757,7 @@ export function MonthCalendar<T>(props: MonthCalendarProps<T>) {
                         disableInteractive,
                         disableRipple,
                         bg,
-                        color,
+                        textColor,
                         sx: mergeSx(
                           {
                             width: widthToPct(width * 119 - 4, daysInWeek),
@@ -785,11 +783,11 @@ export function MonthCalendar<T>(props: MonthCalendarProps<T>) {
                                 event.sourceEvent
                                 ? 0.5
                                 : !disableInteractive &&
-                                  draggedEvent?.dragged &&
-                                  draggedEvent.source.sourceEvent ===
-                                    event.sourceEvent
-                                ? 0.75
-                                : 1,
+                                    draggedEvent?.dragged &&
+                                    draggedEvent.source.sourceEvent ===
+                                      event.sourceEvent
+                                  ? 0.75
+                                  : 1,
                           },
                           event.sourceEvent.selected && {
                             boxShadow: theme.shadows[6],
@@ -845,8 +843,8 @@ export function MonthCalendar<T>(props: MonthCalendarProps<T>) {
                           color: isSameDay(modal.date, startOfMonth)
                             ? (theme) => theme.palette.primary.contrastText
                             : isSameMonth(modal.date, startOfMonth)
-                            ? (theme) => theme.palette.text.primary
-                            : (theme) => theme.palette.text.secondary,
+                              ? (theme) => theme.palette.text.primary
+                              : (theme) => theme.palette.text.secondary,
                         }}
                       >
                         {format(modal.date, "EEE")}
@@ -864,8 +862,8 @@ export function MonthCalendar<T>(props: MonthCalendarProps<T>) {
                           color: isSameDay(modal.date, startOfMonth)
                             ? (theme) => theme.palette.primary.contrastText
                             : isSameMonth(modal.date, startOfMonth)
-                            ? (theme) => theme.palette.text.primary
-                            : (theme) => theme.palette.text.secondary,
+                              ? (theme) => theme.palette.text.primary
+                              : (theme) => theme.palette.text.secondary,
                         }}
                       >
                         {format(modal.date, "d")}
@@ -914,12 +912,8 @@ export function MonthCalendar<T>(props: MonthCalendarProps<T>) {
                           draggedEvent.source.sourceEvent ===
                             event.sourceEvent);
 
-                      const { bg, color } = getEventColor(
-                        now,
-                        getEventEnd(event.sourceEvent),
-                        theme,
-                        event.sourceEvent.color ?? defaultEventColor
-                      );
+                      const bg = event.sourceEvent.styling?.bg ?? defaultEventColor ?? DEFAULT_COLOR;
+                      const textColor = event.sourceEvent.styling?.textColor ?? theme.palette.text.primary;
 
                       const props: React.ComponentPropsWithoutRef<
                         typeof MonthCalendarEvent
@@ -927,7 +921,7 @@ export function MonthCalendar<T>(props: MonthCalendarProps<T>) {
                         event: event.sourceEvent,
                         disableInteractive,
                         bg,
-                        color,
+                        textColor,
                         sx: mergeSx(
                           {
                             width: "100%",

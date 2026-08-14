@@ -1,8 +1,7 @@
-import { getEventEnd, getEventStart } from "@/components/helpers";
 import { TimelineResolution } from "@/components/types";
 import { addMilliseconds } from "date-fns";
 
-export type PartialEvent = { start: Date; end?: Date };
+export type PartialEvent = { start: Date; end: Date };
 
 export const minRenderedEventDuration = (resolution: TimelineResolution) => {
   // month: hour
@@ -30,14 +29,14 @@ export const eventsOverlaps = (
 ) => {
   const minDuration = minRenderedEventDuration(resolution);
 
-  const aStart = getEventStart(a);
-  let aEnd = getEventEnd(a);
+  const aStart = a.start;
+  let aEnd = a.end;
   if (aEnd.getTime() - aStart.getTime() < minDuration) {
     aEnd = addMilliseconds(aStart, minDuration);
   }
 
-  const bStart = getEventStart(b);
-  let bEnd = getEventEnd(b);
+  const bStart = b.start;
+  let bEnd = b.end;
   if (bEnd.getTime() - bStart.getTime() < minDuration) {
     bEnd = addMilliseconds(bStart, minDuration);
   }

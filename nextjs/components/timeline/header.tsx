@@ -33,7 +33,7 @@ function MonthHeader({
 }: {
   startTime: Date;
   now: Date;
-  onCreateEvent?: (start: Date, end?: Date | undefined) => void;
+  onCreateEvent?: (start: Date, end: Date) => void;
   startDay: StartDay;
 }) {
   const options: StartOfWeekOptions = {
@@ -176,7 +176,7 @@ function ThreeMonthHeader({
   startTime: Date;
   now: Date;
   startDay: StartDay;
-  onCreateEvent?: (start: Date, end?: Date | undefined) => void;
+  onCreateEvent?: (start: Date, end: Date) => void;
 }) {
   const monthMap = new Map<number, Date>();
   const weeks: Date[] = [];
@@ -293,7 +293,7 @@ function YearHeader({
   startTime: Date;
   now: Date;
   startDay: StartDay;
-  onCreateEvent?: (start: Date, end?: Date | undefined) => void;
+  onCreateEvent?: (start: Date, end: Date) => void;
 }) {
   const quarters: Date[] = [];
   const months: Date[] = [];
@@ -350,7 +350,7 @@ function ThreeYearHeader({
 }: {
   startTime: Date;
   now: Date;
-  onCreateEvent?: (start: Date, end?: Date | undefined) => void;
+  onCreateEvent?: (start: Date, end: Date) => void;
 }) {
   const years: Date[] = [];
   const quarters: Date[] = [];
@@ -413,7 +413,7 @@ export function Header(props: {
   now: Date;
   startDay: StartDay;
   empty: boolean;
-  onCreateEvent?: (start: Date, end?: Date | undefined) => void;
+  onCreateEvent?: (start: Date, end: Date) => void;
 }) {
   const { resolution } = props;
 

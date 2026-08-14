@@ -20,7 +20,7 @@ test("split_multi_week_events", () => {
       title: "3 day event",
       start: startOfDay(addDays(new Date(), 1)), // 16th 00:00
       end: endOfDay(addDays(new Date(), 3)), // 18th 23:59
-      color: "pink",
+      styling: { color: "pink" },
     },
   };
   expect(
@@ -63,7 +63,7 @@ test("split_multi_week_events", () => {
       title: "2 day event",
       start: startOfDay(addDays(new Date(), 0)), // 15th 00:00
       end: endOfDay(addDays(new Date(), 1)), // 16th 23:59,
-      color: "pink",
+      styling: { color: "pink" },
     },
   };
   expect(
@@ -220,7 +220,7 @@ it('should leave the tail of the "snake" intact', () => {
             title: "3 day event",
             start: startOfDay(addDays(new Date(), 1)), // 16th 00:00
             end: endOfDay(addDays(new Date(), 3)), // 18th 23:59
-            color: "pink",
+            styling: { color: "pink" },
           },
           start: startOfDay(addDays(new Date(), 1)), // 16th 00:00
           end: endOfDay(addDays(new Date(), 3)), // 18th 23:59
@@ -230,7 +230,7 @@ it('should leave the tail of the "snake" intact', () => {
             title: "3 day event overlapping",
             start: startOfDay(addDays(new Date(), 2)), // 17th 00:00
             end: endOfDay(addDays(new Date(), 4)), // 19th 23:59
-            color: "pink",
+            styling: { color: "pink" },
           },
           start: startOfDay(addDays(new Date(), 2)), // 17th 00:00
           end: endOfDay(addDays(new Date(), 4)), // 19th 23:59

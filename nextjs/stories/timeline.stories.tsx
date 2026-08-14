@@ -154,8 +154,8 @@ export const WithEvents: Story = {
           },
           {
             start: addDays(startOfDay(new Date()), 1),
-            end: addDays(startOfDay(new Date()), 1),
-            title: "task",
+            end: addMinutes(addDays(startOfDay(new Date()), 1), 15),
+            title: "short event",
           },
           {
             start: addHours(startOfDay(addDays(new Date(), 3)), 5),

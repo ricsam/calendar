@@ -22,7 +22,7 @@ export function getAllDayOverlaps<T>(
       const dayEnd = endOfDay(addDays(startOfDay(startOfWeek), i));
       return areIntervalsOverlapping(
         { start: dayStart, end: dayEnd },
-        { start: event.start, end: event.end ?? event.start }
+        { start: event.start, end: event.end }
       );
     });
 

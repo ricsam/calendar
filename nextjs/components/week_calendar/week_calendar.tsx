@@ -22,11 +22,7 @@ import {
 import React from "react";
 import {
   DEFAULT_COLOR,
-  getEventColor,
-  getEventEnd,
-  getEventStart,
   isAllDayEvent,
-  isTask,
   mergeSx,
   widthToPct,
 } from "../helpers";
@@ -84,7 +80,7 @@ export type WeekCalendarProps<T> = {
    * @param end when event ends
    * @returns void
    */
-  onCreateEvent?: (start: Date, end?: Date) => void;
+  onCreateEvent?: (start: Date, end: Date) => void;
 
   /**
    * Triggered when an event is moved or resized
@@ -96,7 +92,7 @@ export type WeekCalendarProps<T> = {
   onMoveEvent?: (
     event: CalendarEvent<T>,
     newStart: Date,
-    newEnd: Date | undefined
+    newEnd: Date
   ) => void;
 
   /**
@@ -184,7 +180,7 @@ export function WeekCalendar<T>(props: WeekCalendarProps<T>) {
         start: startOfWeek,
         end: addDays(startOfWeek, workWeek ? 5 : 7),
       },
-      { start: event.start, end: event.end ?? event.start }
+      { start: event.start, end: event.end }
     );
 
     if (!eventOverlapWithWeek) {
@@ -273,8 +269,13 @@ function WeekCalendarHeader<T>(props: {
   events: CalendarEvent<T>[];
   sticky?: boolean;
 }) {
-  const { workWeek, startOfWeek, now, onCreateEvent, ...calendarProps } =
-    useCalendar();
+  const {
+    workWeek,
+    startOfWeek,
+    now,
+    onCreateEvent,
+    ...calendarProps
+  } = useCalendar();
   const daysInWeek = workWeek ? 5 : 7;
 
   const [events, draggedEvent, setDraggedEvent] = useDragableEvents(
@@ -307,10 +308,7 @@ function WeekCalendarHeader<T>(props: {
       if (addedDays !== 0) {
         return {
           start: addDays(dragged.event.start, addedDays),
-          end: addDays(
-            dragged.event.end ?? endOfDay(dragged.event.start),
-            addedDays
-          ),
+          end: addDays(dragged.event.end, addedDays),
         };
       }
     }
@@ -441,7 +439,7 @@ function WeekCalendarHeader<T>(props: {
 
           {events.map((event, index) => {
             const start = startOfDay(event.start);
-            const end = parseAllDayEnd(event.end ?? endOfDay(event.start));
+            const end = parseAllDayEnd(event.end);
             const endOfWeek = addDays(startOfWeek, daysInWeek);
 
             const rawX = differenceInCalendarDays(start, startOfWeek);
@@ -460,12 +458,8 @@ function WeekCalendarHeader<T>(props: {
 
             const dayOverflowRight = differenceInCalendarDays(end, endOfWeek);
 
-            const { bg, color } = getEventColor(
-              now,
-              end,
-              theme,
-              event.sourceEvent.color ?? calendarProps.defaultEventColor
-            );
+            const bg = event.sourceEvent.styling?.bg ?? calendarProps.defaultEventColor ?? DEFAULT_COLOR;
+            const textColor = event.sourceEvent.styling?.textColor ?? theme.palette.text.primary;
 
             const disableInteractive =
               !calendarProps.onClickEvent && !calendarProps.onMoveEvent;
@@ -525,7 +519,7 @@ function WeekCalendarHeader<T>(props: {
                   <AllDayCalendarOverflow
                     direction="left"
                     value={rawX}
-                    color={color}
+                    textColor={textColor}
                     bg={bg}
                     valueDate={start}
                     compact={width <= 1}
@@ -551,7 +545,7 @@ function WeekCalendarHeader<T>(props: {
                   }}
                 >
                   <Typography
-                    color={color}
+                    color={textColor}
                     variant="event"
                     sx={{
                       pointerEvents: "none",
@@ -565,7 +559,7 @@ function WeekCalendarHeader<T>(props: {
                   {event.sourceEvent.endAdornment && dayOverflowRight <= 0 ? (
                     <>
                       <Box sx={{ flex: 1 }}></Box>
-                      <Box>{event.sourceEvent.endAdornment({ bg, color })}</Box>
+                      <Box>{event.sourceEvent.endAdornment({ bg, textColor })}</Box>
                     </>
                   ) : null}
                 </Box>
@@ -574,12 +568,12 @@ function WeekCalendarHeader<T>(props: {
                     direction="right"
                     value={dayOverflowRight}
                     bg={bg}
-                    color={color}
+                    textColor={textColor}
                     valueDate={end}
                     compact={width <= 1}
                     endAdornment={
                       event.sourceEvent.endAdornment
-                        ? event.sourceEvent.endAdornment({ bg, color })
+                        ? event.sourceEvent.endAdornment({ bg, textColor })
                         : undefined
                     }
                   />
@@ -706,8 +700,13 @@ function WeekCalendarGrid<T>(props: {
   events: CalendarEvent<T>[];
   autoScroll?: boolean;
 }) {
-  const { workWeek, now, startOfWeek, startDay, ...calendarProps } =
-    useCalendar<T>();
+  const {
+    workWeek,
+    now,
+    startOfWeek,
+    startDay,
+    ...calendarProps
+  } = useCalendar<T>();
   const daysInWeek = workWeek ? 5 : 7;
 
   const snapFn = (start: Date, end: Date, strict?: boolean) => {
@@ -745,12 +744,12 @@ function WeekCalendarGrid<T>(props: {
       return {
         ...ev,
         start: min([
-          max([getEventStart(ev), startOfWeek]),
+          max([ev.start, startOfWeek]),
           // it must be within the week
           subMinutes(endOfWeek(startOfWeek, options), 15),
         ]),
         // an event "collision box" should be at least 15 minutes in height (=15px)
-        end: max([getEventEnd(ev), addMinutes(ev.start, 15)]),
+        end: max([ev.end, addMinutes(ev.start, 15)]),
       };
     })
     .flatMap((defaultEvent) => {
@@ -803,8 +802,8 @@ function WeekCalendarGrid<T>(props: {
           : // only allow drag to create event on the current day
             0;
 
-      let start = getEventStart(dragged.event.sourceEvent);
-      let end = getEventEnd(dragged.event.sourceEvent);
+      let start = dragged.event.sourceEvent.start;
+      let end = dragged.event.sourceEvent.end;
 
       if (addedDays !== 0) {
         start = addDays(start, addedDays);
@@ -885,13 +884,13 @@ function WeekCalendarGrid<T>(props: {
         event: {
           start,
           end,
-          sourceEvent: {
-            canEdit: true,
-            color: calendarProps.defaultEventColor,
-            end,
-            start,
-            title: "(No title)",
-          } as CalendarEvent<T>,
+            sourceEvent: {
+              canEdit: true,
+              styling: { bg: calendarProps.defaultEventColor },
+              end,
+              start,
+              title: "(No title)",
+            } as CalendarEvent<T>,
         },
         w: 1,
         x: day + 1,
@@ -1019,27 +1018,21 @@ function WeekCalendarGrid<T>(props: {
           const time = (
             <>
               {format(displayStart, height >= 30 ? "h:mm" : "h:mmaaa")}
-              {event.sourceEvent.end && height >= 30 ? (
+              {height >= 30 ? (
                 <> – {format(displayEnd, "h:mmaaa")}</>
               ) : null}
             </>
           );
           const colX = rect.x;
 
-          const { bg, color } = getEventColor(
-            now,
-            getEventEnd(event.sourceEvent),
-            theme,
-            event.sourceEvent.color ?? calendarProps.defaultEventColor
-          );
+          const bg = event.sourceEvent.styling?.bg ?? calendarProps.defaultEventColor ?? DEFAULT_COLOR;
+          const textColor = event.sourceEvent.styling?.textColor ?? theme.palette.text.primary;
 
           const disableInteractive =
             !calendarProps.onClickEvent && !calendarProps.onMoveEvent;
           const textOpacityStyle =
-            getEventEnd(event.sourceEvent).getTime() - now.getTime() < 0
-              ? {
-                  opacity: "0.5",
-                }
+            event.sourceEvent.styling?.textOpacity !== undefined
+              ? { opacity: event.sourceEvent.styling.textOpacity }
               : {};
           const dataProps: any = {
             "data-type": "week-calendar-sub-day-event",
@@ -1131,7 +1124,7 @@ function WeekCalendarGrid<T>(props: {
                   {height >= 30 ? (
                     <>
                       <Typography
-                        color={color}
+                        color={textColor}
                         variant="event"
                         component="div"
                         sx={mergeSx(
@@ -1148,7 +1141,7 @@ function WeekCalendarGrid<T>(props: {
                       </Typography>
                       <Typography
                         component="div"
-                        color={color}
+                        color={textColor}
                         variant="event"
                         sx={mergeSx(
                           {
@@ -1166,7 +1159,7 @@ function WeekCalendarGrid<T>(props: {
                     </>
                   ) : (
                     <Typography
-                      color={color}
+                      color={textColor}
                       variant="event"
                       component="div"
                       sx={mergeSx(
@@ -1197,14 +1190,13 @@ function WeekCalendarGrid<T>(props: {
                         justifyContent: "center",
                       }}
                     >
-                      <Box>{event.sourceEvent.endAdornment({ bg, color })}</Box>
+                      <Box>{event.sourceEvent.endAdornment({ bg, textColor })}</Box>
                     </Box>
                   </>
                 ) : null}
               </Box>
 
               {event.sourceEvent.canEdit &&
-                !isTask(event.sourceEvent) &&
                 (["start", "end"] as const).map((pos, i) => (
                   <Box
                     key={i}
@@ -1273,7 +1265,7 @@ function WeekCalendarGrid<T>(props: {
 function AllDayCalendarOverflow({
   direction,
   value,
-  color,
+  textColor,
   bg,
   valueDate,
   compact,
@@ -1282,7 +1274,7 @@ function AllDayCalendarOverflow({
   direction: "left" | "right";
   value: number;
   valueDate: Date;
-  color: string;
+  textColor: string;
   bg: string;
   compact?: boolean;
   endAdornment?: React.ReactNode;
@@ -1314,7 +1306,7 @@ function AllDayCalendarOverflow({
       >
         <Typography
           variant="event"
-          color={color}
+          color={textColor}
           sx={{
             whiteSpace: "nowrap",
             opacity: 0.7,

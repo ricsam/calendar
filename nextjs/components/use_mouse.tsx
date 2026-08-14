@@ -9,14 +9,14 @@ import {
   subMinutes,
 } from "date-fns";
 import React, { MutableRefObject } from "react";
-import { getEventEnd, getEventStart, tuple } from "./helpers";
+import { tuple } from "./helpers";
 import { CalendarEvent, ScrollContainer } from "./types";
 import { ModifiableEvent } from "./week_calendar/types";
 
 /**
  * The dragged event
  */
-export type DraggedEvent<T extends { start: Date; end?: Date | undefined }> = {
+export type DraggedEvent<T extends { start: Date; end: Date }> = {
   /**
    * The new event that is being dragged (source event with new start/end)
    */
@@ -82,7 +82,7 @@ export type EventContainer = {
 /**
  * The position of the event being dragged
  */
-export type DragPosition<T extends { start: Date; end?: Date | undefined }> = {
+export type DragPosition<T extends { start: Date; end: Date }> = {
   /**
    * When creating a new event, the type is "new"
    * When dragging an existing event, the type is "existing"
@@ -123,7 +123,7 @@ export function useMouse<T>(
     onMoveEvent?: (
       event: ModifiableEvent<T>,
       start: Date,
-      end: Date | undefined
+      end: Date
     ) => void;
     onClickEvent?: (event: ModifiableEvent<T>, nativeEvent: MouseEvent) => void;
     getEvent: (id: string) => ModifiableEvent<T> | undefined;
@@ -142,7 +142,7 @@ export function useMouse<T>(
       pos0: MouseStatePos,
       container: DOMRect
     ) => DragPosition<ModifiableEvent<T>> | undefined;
-    onCreateEvent?: (start: Date, end?: Date) => void;
+    onCreateEvent?: (start: Date, end: Date) => void;
     eventContainerRef: React.MutableRefObject<HTMLDivElement | null>;
     scrollContainers: ScrollContainer[];
     constrainResize?: (
@@ -336,18 +336,8 @@ export function useMouse<T>(
             effectRefs.current.onMoveEvent ||
             effectRefs.current.onCreateEvent
           ) {
-            const sourceEvent = draggedEvent.source.sourceEvent;
             const newStart = draggedEvent.dragged.start;
-            let newEnd: Date | undefined = draggedEvent.dragged.end;
-            if (!sourceEvent.end) {
-              // maintain as full day task
-              newEnd = undefined;
-            } else if (
-              sourceEvent.start.getTime() === sourceEvent.end?.getTime()
-            ) {
-              // maintain as sub day task
-              newEnd = newStart;
-            }
+            const newEnd = draggedEvent.dragged.end;
             if (dragged?.type === "new") {
               if (effectRefs.current.onCreateEvent) {
                 effectRefs.current.onCreateEvent(newStart, newEnd);
@@ -469,8 +459,8 @@ export function useMouse<T>(
             newEventTime: { start: Date; end: Date },
             dragged: DragPosition<ModifiableEvent<T>>
           ) => {
-            const origStart = getEventStart(dragged.event.sourceEvent);
-            const origEnd = getEventEnd(dragged.event.sourceEvent);
+            const origStart = dragged.event.sourceEvent.start;
+            const origEnd = dragged.event.sourceEvent.end;
             const constrainResize = effectRefs.current.constrainResize;
             if (constrainResize) {
               return constrainResize(
@@ -577,8 +567,8 @@ export function useDragableEvents<T>(
      */
     const allEvents: ModifiableEvent<T>[] = events.map((sourceEvent) => ({
       sourceEvent,
-      start: getEventStart(sourceEvent),
-      end: getEventEnd(sourceEvent),
+      start: sourceEvent.start,
+      end: sourceEvent.end,
     }));
 
     /**
@@ -589,8 +579,6 @@ export function useDragableEvents<T>(
         ...draggedEvent.source,
         ...draggedEvent.dragged,
       };
-      newDragged.start = getEventStart(newDragged);
-      newDragged.end = getEventEnd(newDragged);
 
       if (snapEvent) {
         const snap = snapEvent(newDragged.start, newDragged.end);
@@ -686,10 +674,10 @@ export function useEffectRefs<T>(
     onMoveEvent?: (
       event: CalendarEvent<T>,
       newStart: Date,
-      newEnd: Date | undefined
+      newEnd: Date
     ) => void;
     onClickEvent?: (event: CalendarEvent<T>, nativeEvent: MouseEvent) => void;
-    onCreateEvent?: (start: Date, end?: Date) => void;
+    onCreateEvent?: (start: Date, end: Date) => void;
     scrollContainers: ScrollContainer[];
   },
   createNewEvent?: (
@@ -704,7 +692,7 @@ export function useEffectRefs<T>(
 ) {
   const ome = calendarProps.onMoveEvent;
   const onMoveEvent = ome
-    ? (event: ModifiableEvent<T>, start: Date, end?: Date) => {
+    ? (event: ModifiableEvent<T>, start: Date, end: Date) => {
         ome(event.sourceEvent, start, end);
       }
     : undefined;
