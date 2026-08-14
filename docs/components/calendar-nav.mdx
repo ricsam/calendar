@@ -1,0 +1,32 @@
+---
+title: CalendarNav
+description: Controlled navigation for month and week views.
+---
+
+# CalendarNav
+
+`CalendarNav` is deliberately separate from the calendar views. This lets you place it in your application shell or replace it with your own controls.
+
+```tsx
+const [time, setTime] = useState(new Date());
+
+<>
+  <CalendarNav type="month" time={time} setTime={setTime} />
+  <MonthCalendar startOfMonth={time} events={events} />
+</>;
+```
+
+## Props
+
+<ResponseField name="type" required type='"month" | "week"'>
+  Controls the date label and previous/next step.
+</ResponseField>
+<ResponseField name="time" type="Date">
+  Controlled visible date. Defaults to today.
+</ResponseField>
+<ResponseField name="setTime" type="(date: Date) => void">
+  Receives the previous month/week, next month/week, or today.
+</ResponseField>
+<ResponseField name="now" type="Date">
+  Date selected by the Today button. Defaults to `new Date()`.
+</ResponseField>

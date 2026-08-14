@@ -1,0 +1,79 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "maple",
+  "name": "React MUI Calendar",
+  "description": "Month and week calendar components for React and Material UI.",
+  "colors": {
+    "primary": "#E85D3F",
+    "light": "#F07A5E",
+    "dark": "#C9442A"
+  },
+  "appearance": {
+    "default": "system"
+  },
+  "fonts": {
+    "family": "Roboto",
+    "heading": {
+      "family": "Roboto",
+      "weight": 600
+    }
+  },
+  "navigation": {
+    "pages": [
+      {
+        "group": "Start here",
+        "pages": ["index", "quickstart", "theming"]
+      },
+      {
+        "group": "Components",
+        "pages": [
+          "components/month-calendar",
+          "components/week-calendar",
+          "components/calendar-nav"
+        ]
+      },
+      {
+        "group": "Reference",
+        "pages": [
+          "reference/calendar-event",
+          "reference/callbacks",
+          "migration"
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Component demo",
+          "href": "https://github.com/ricsam/calendar",
+          "icon": "calendar-days"
+        }
+      ]
+    }
+  },
+  "navbar": {
+    "links": [
+      {
+        "type": "github",
+        "href": "https://github.com/ricsam/calendar"
+      },
+      {
+        "label": "npm",
+        "href": "https://www.npmjs.com/package/@ricsam/react-mui-calendar"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Open demo",
+      "href": "https://github.com/ricsam/calendar"
+    }
+  },
+  "contextual": {
+    "options": ["copy", "view", "chatgpt", "claude", "cursor"]
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/ricsam/calendar"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+---
+title: CalendarEvent
+description: Event data model and generic application payloads.
+---
+
+# CalendarEvent
+
+```ts
+type CalendarEvent<T = undefined> = {
+  start: Date;
+  end: Date;
+  title?: string;
+  styling?: {
+    bg?: string;
+    textColor?: string;
+    textOpacity?: number;
+  };
+  canEdit?: boolean;
+  selected?: boolean;
+  endAdornment?: (colors: { bg: string; textColor: string }) => React.ReactNode;
+} & (T extends { data: unknown } ? T : {});
+```
+
+## Application data
+
+Use the generic parameter to carry your own stable identifier or record. The same typed event is passed to click and movement callbacks.
+
+```ts
+type ProjectEvent = CalendarEvent<{
+  data: {
+    id: string;
+    projectId: string;
+  };
+}>;
+```
+
+## Duration rules
+
+- Events under 24 hours appear in the timed grid.
+- Events of 24 hours or longer appear in the all-day area.
+- A same-day event from approximately start-of-day through end-of-day also appears as all-day.
+- `end` must be later than `start`; normalize invalid records before rendering.

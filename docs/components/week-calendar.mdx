@@ -1,0 +1,48 @@
+---
+title: WeekCalendar
+description: Time-grid calendar with overlaps, all-day events, and work-week mode.
+---
+
+# WeekCalendar
+
+```tsx
+import { WeekCalendar } from "@ricsam/react-mui-calendar";
+
+<div style={{ height: 720, overflow: "auto" }}>
+  <WeekCalendar
+    events={events}
+    startOfWeek={visibleDate}
+    workWeek
+    stickyHeader
+    autoScroll
+    onClickEvent={(event) => openEditor(event)}
+    onMoveEvent={(event, start, end) => updateEvent(event, { start, end })}
+  />
+</div>;
+```
+
+## Props
+
+<ResponseField name="events" type="CalendarEvent<T>[]">
+  Events to render. Defaults to an empty array.
+</ResponseField>
+<ResponseField name="startOfWeek" type="Date">
+  Any date in the visible week. Defaults to today.
+</ResponseField>
+<ResponseField name="startDay" type='"monday" | "sunday"'>
+  First day in a full week. Defaults to `monday`.
+</ResponseField>
+<ResponseField name="workWeek" type="boolean">
+  Render Monday through Friday. This forces Monday as the start day.
+</ResponseField>
+<ResponseField name="stickyHeader" type="boolean">
+  Keep day labels and all-day events visible within a bounded container.
+</ResponseField>
+<ResponseField name="autoScroll" type="boolean">
+  Scroll the time grid to the current-time indicator after mounting.
+</ResponseField>
+<ResponseField name="now" type="Date">
+  Time used for day highlighting and the time indicator.
+</ResponseField>
+
+When more than six all-day rows overlap, the header collapses them. Users can expand the area with the chevron or per-day “more” links.

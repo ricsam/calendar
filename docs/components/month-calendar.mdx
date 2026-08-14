@@ -1,0 +1,44 @@
+---
+title: MonthCalendar
+description: Responsive month view for timed, all-day, and multi-week events.
+---
+
+# MonthCalendar
+
+```tsx
+import { MonthCalendar } from "@ricsam/react-mui-calendar";
+
+<div style={{ height: 680 }}>
+  <MonthCalendar
+    events={events}
+    startOfMonth={visibleDate}
+    startDay="monday"
+    onClickEvent={(event) => openEditor(event)}
+    onCreateEvent={(start, end) => createEvent({ start, end })}
+    onMoveEvent={(event, start, end) => updateEvent(event, { start, end })}
+  />
+</div>;
+```
+
+## Props
+
+<ResponseField name="events" type="CalendarEvent<T>[]">
+  Events to render. Defaults to an empty array.
+</ResponseField>
+<ResponseField name="startOfMonth" type="Date">
+  Any date in the visible month. Defaults to today.
+</ResponseField>
+<ResponseField name="startDay" type='"monday" | "sunday"'>
+  First day of each row. Defaults to `monday`.
+</ResponseField>
+<ResponseField name="now" type="Date">
+  Time used to highlight the current date. Defaults to `new Date()`.
+</ResponseField>
+<ResponseField name="defaultEventColor" type="string">
+  Fallback CSS background color when an event does not provide `styling.bg`.
+</ResponseField>
+<ResponseField name="scrollContainers" type="ScrollContainer[]">
+  Scrollable ancestors tracked while dragging. The window is used by default.
+</ResponseField>
+
+The interaction props are documented in [Callbacks](/reference/callbacks).

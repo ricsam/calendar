@@ -1,0 +1,48 @@
+---
+title: Migration notes
+description: Changes from the original Anocca calendar package and repository layout.
+---
+
+# Migration notes
+
+## Package name
+
+Replace the former internal package name with:
+
+```diff
+- import { MonthCalendar } from "@anocca-os/calendar";
++ import { MonthCalendar } from "@ricsam/react-mui-calendar";
+```
+
+## Events require an end
+
+Task-specific behavior has been removed. Every event now requires a concrete `end` date.
+
+```diff
+const event = {
+  start,
++ end,
+};
+```
+
+## Styling belongs to the consumer
+
+```diff
+const event = {
+- color: "#4338ca",
++ styling: { bg: "#4338ca", textColor: "#fff" },
+};
+```
+
+## Timeline removed
+
+`Timeline`, `TimelineNav`, timeline resolutions, sizing controls, and `eventsToRows` are no longer exported. Use `MonthCalendar` or `WeekCalendar`, or keep an older package version while migrating timeline use cases to a dedicated Gantt/timeline library.
+
+## Development setup
+
+The old Next.js and Storybook applications were replaced by one Vite catalog:
+
+```bash
+npm install
+npm run dev
+```

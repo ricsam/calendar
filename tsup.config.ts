@@ -1,0 +1,21 @@
+import { defineConfig } from "tsup";
+
+export default defineConfig({
+  entry: ["src/index.ts"],
+  format: ["esm", "cjs"],
+  dts: true,
+  sourcemap: true,
+  clean: true,
+  treeshake: true,
+  splitting: false,
+  outDir: "dist",
+  external: [
+    "react",
+    "react-dom",
+    "react/jsx-runtime",
+    "@emotion/react",
+    "@emotion/styled",
+    "@mui/material",
+    "date-fns",
+  ],
+});

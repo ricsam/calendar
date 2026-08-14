@@ -1,0 +1,55 @@
+---
+title: Theming
+description: Use the bundled provider or merge calendar typography into an existing MUI theme.
+---
+
+## Standalone provider
+
+`CalendarThemeProvider` creates a light or dark Material UI theme and adds the compact `event` typography variant used by calendar entries.
+
+```tsx
+<CalendarThemeProvider theme="dark">
+  <WeekCalendar events={events} />
+</CalendarThemeProvider>
+```
+
+Omit `theme` to follow the user's `prefers-color-scheme` setting.
+
+## Existing MUI application
+
+Merge `calendarTheme` while creating your own theme.
+
+```tsx
+import { createTheme, ThemeProvider } from "@mui/material";
+import { calendarTheme } from "@ricsam/react-mui-calendar";
+
+const theme = createTheme(
+  {
+    palette: {
+      primary: { main: "#4338ca" },
+    },
+  },
+  calendarTheme,
+);
+
+<ThemeProvider theme={theme}>
+  <App />
+</ThemeProvider>;
+```
+
+## Event styling
+
+The consumer supplies final CSS colors. This keeps domain logic such as ownership, status, and permissions outside the component library.
+
+```ts
+const event = {
+  start,
+  end,
+  title: "Design review",
+  styling: {
+    bg: ownedByCurrentUser ? "#4338ca" : "#e2e8f0",
+    textColor: ownedByCurrentUser ? "#fff" : "#334155",
+    textOpacity: archived ? 0.55 : 1,
+  },
+};
+```

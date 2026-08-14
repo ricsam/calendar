@@ -1,0 +1,40 @@
+---
+title: React MUI Calendar
+description: Focused month and week calendar components for React and Material UI.
+---
+
+# Calendar views that belong in your product
+
+`@ricsam/react-mui-calendar` provides interactive month and week views without a scheduling backend, opinionated event editor, or framework runtime. Your application owns the event data and the components report interactions through callbacks.
+
+<CardGroup cols={2}>
+  <Card
+    title="Month view"
+    icon="calendar-days"
+    href="/components/month-calendar"
+  >
+    Render timed, all-day, and multi-week events in a responsive month grid.
+  </Card>
+  <Card title="Week view" icon="calendar-week" href="/components/week-calendar">
+    Render overlapping timed events and an expandable all-day area.
+  </Card>
+</CardGroup>
+
+## Install
+
+```bash
+npm install @ricsam/react-mui-calendar @mui/material @emotion/react @emotion/styled date-fns
+```
+
+## Design principles
+
+- **Controlled data.** There is no hidden event store. Pass `events` and update them after callbacks.
+- **Consumer-owned color.** Pass final CSS colors through `event.styling`; the calendar does not infer ownership or mutate old-event colors.
+- **MUI-native.** Use the bundled calendar theme alone or merge it into your existing Material UI theme.
+- **Focused scope.** Month, week, and their navigation are included. The former timeline component has been removed.
+
+<Note>
+  `start` and `end` are both required. For an all-day event, pass the start and
+  end of the day. Events of 24 hours or longer are displayed in the all-day
+  area.
+</Note>

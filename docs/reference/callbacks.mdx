@@ -1,0 +1,47 @@
+---
+title: Interaction callbacks
+description: Keep event state controlled while supporting clicks, creation, movement, and resizing.
+---
+
+# Interaction callbacks
+
+## Click
+
+```ts
+onClickEvent?: (event: CalendarEvent<T>, nativeEvent: MouseEvent) => void;
+```
+
+Use it to select an event, navigate to details, or open your editor.
+
+## Create
+
+```ts
+onCreateEvent?: (start: Date, end: Date) => void;
+```
+
+Providing this callback enables click-and-drag creation in empty calendar space. Add the event to your own state to render it.
+
+## Move and resize
+
+```ts
+onMoveEvent?: (
+  event: CalendarEvent<T>,
+  newStart: Date,
+  newEnd: Date,
+) => void;
+```
+
+Moving is enabled when this callback exists and `event.canEdit` is true. Timed week events also expose resize handles.
+
+```tsx
+<WeekCalendar
+  events={events}
+  onMoveEvent={(moved, start, end) => {
+    setEvents((current) =>
+      current.map((event) =>
+        event.data.id === moved.data.id ? { ...event, start, end } : event,
+      ),
+    );
+  }}
+/>
+```
