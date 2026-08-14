@@ -25,6 +25,40 @@ import { StartDay, TimelineResolution } from "../types";
 import { FlexCol, FlexRow } from "../wrappers";
 import { widthToPct } from "./to_pct";
 
+function WeekHeader({
+  startTime,
+  now,
+  onCreateEvent,
+}: {
+  startTime: Date;
+  now: Date;
+  startDay: StartDay;
+  onCreateEvent?: (start: Date, end?: Date | undefined) => void;
+}) {
+  const days: Date[] = [];
+  for (let i = 0; i < 7; i += 1) {
+    days.push(addDays(startTime, i));
+  }
+  return (
+    <FlexCol sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <BigTime
+        now={now}
+        times={days}
+        isActive={isSameDay}
+        formatDate={(date) => format(date, "EEE d")}
+        width={720 / 7}
+        textSize="h5"
+        verticalAlign="center"
+        onCreateEvent={
+          onCreateEvent
+            ? (start) => onCreateEvent(start, endOfDay(start))
+            : undefined
+        }
+      />
+    </FlexCol>
+  );
+}
+
 function MonthHeader({
   startTime,
   now,
@@ -192,7 +226,7 @@ function ThreeMonthHeader({
 
   const totalWidth = differenceInMilliseconds(
     addWeeks(startTime, 15),
-    startTime
+    startTime,
   );
 
   const options: StartOfWeekOptions = {
@@ -207,7 +241,7 @@ function ThreeMonthHeader({
             const xStart = month.getTime() - startTime.getTime();
             const xWidth = differenceInMilliseconds(
               startOfMonth(addMonths(month, 1)),
-              month
+              month,
             );
 
             return (
@@ -417,6 +451,9 @@ export function Header(props: {
 }) {
   const { resolution } = props;
 
+  if (resolution === "week") {
+    return <WeekHeader {...props} />;
+  }
   if (resolution === "month") {
     return <MonthHeader {...props} />;
   }
@@ -438,6 +475,8 @@ function BigTime({
   formatDate,
   width,
   onCreateEvent,
+  textSize,
+  verticalAlign,
 }: {
   now: Date;
   times: Date[];
@@ -445,6 +484,8 @@ function BigTime({
   formatDate: (date: Date) => string;
   width: number;
   onCreateEvent?: (start: Date) => void;
+  textSize?: "h3" | "h4" | "h5";
+  verticalAlign?: "flex-start" | "center";
 }) {
   return (
     <FlexRow>
@@ -461,18 +502,19 @@ function BigTime({
               m: 0,
               height: "56px",
               display: "flex",
-              alignItems: "flex-start",
+              alignItems: verticalAlign ?? "flex-start",
             }}
             justifyContent={"center"}
           >
             <Box>
               <Typography
-                variant="h4"
+                variant={textSize ?? "h4"}
                 sx={{
                   color: (theme) =>
                     theme.palette.text[
                       isActive(time, now) ? "primary" : "secondary"
                     ],
+                  whiteSpace: "nowrap",
                 }}
               >
                 {formatDate(time)}
@@ -507,7 +549,7 @@ function BigTime({
                   borderRadius: "1px",
                 }}
               ></Box>
-            </Box>
+            </Box>,
           );
         }
         return els;
@@ -589,7 +631,7 @@ function SmallTime({
                   borderTopRightRadius: "1px",
                 }}
               ></Box>
-            </Box>
+            </Box>,
           );
         }
         return els;

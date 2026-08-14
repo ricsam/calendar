@@ -25,6 +25,31 @@ function Wrapper({ children }: { children: React.ReactNode }) {
   return <Box sx={{ position: "absolute", inset: 0 }}>{children}</Box>;
 }
 
+function WeekGrid({
+  startTime,
+  startOfTimeline,
+  totalSecondsOfTimeline,
+}: {
+  startTime: Date;
+  noHeader?: boolean;
+  startOfTimeline: number;
+  totalSecondsOfTimeline: number;
+}) {
+  const days: Date[] = [];
+  for (let i = 0; i < 7; i += 1) {
+    days.push(addDays(startTime, i));
+  }
+  return (
+    <Wrapper>
+      <BigTime
+        times={days}
+        startOfTimeline={startOfTimeline}
+        totalSecondsOfTimeline={totalSecondsOfTimeline}
+      />
+    </Wrapper>
+  );
+}
+
 function MonthHeader({
   startTime,
   noHeader,
@@ -137,7 +162,7 @@ function ThreeMonthHeader({
 
   const totalWidth = differenceInMilliseconds(
     addWeeks(startTime, 15),
-    startTime
+    startTime,
   );
 
   return (
@@ -279,6 +304,9 @@ export function Grid(props: {
 }) {
   const { resolution } = props;
 
+  if (resolution === "week") {
+    return <WeekGrid {...props} />;
+  }
   if (resolution === "month") {
     return <MonthHeader {...props} />;
   }
@@ -307,7 +335,8 @@ function BigTime({
       <FlexRow sx={{ height: "100%" }}>
         {times.flatMap((month, index) => {
           const x = widthToPct(
-            (720 * (month.getTime() - startOfTimeline)) / totalSecondsOfTimeline
+            (720 * (month.getTime() - startOfTimeline)) /
+              totalSecondsOfTimeline,
           );
           const els = [];
           if (index > 0) {
@@ -332,7 +361,7 @@ function BigTime({
                     borderRadius: "1px",
                   }}
                 ></Box>
-              </Box>
+              </Box>,
             );
           }
           return els;
@@ -371,7 +400,7 @@ function SmallTime({
             <FlexRow key={index} justifyContent="center" flex="1"></FlexRow>,
           ];
           const x = widthToPct(
-            (720 * (week.getTime() - startOfTimeline)) / totalSecondsOfTimeline
+            (720 * (week.getTime() - startOfTimeline)) / totalSecondsOfTimeline,
           );
           const divider = (index: number) => (
             <Box

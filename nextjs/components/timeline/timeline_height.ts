@@ -3,6 +3,9 @@ import { TimelineResolution } from "../types";
 export const timelineHeaderHeight = (props: {
   resolution: TimelineResolution;
 }) => {
+  if (props.resolution === "week") {
+    return 56 + 18;
+  }
   if (props.resolution === "month") {
     return 56 + 18;
   }

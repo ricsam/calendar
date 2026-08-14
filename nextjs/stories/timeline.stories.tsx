@@ -79,7 +79,7 @@ export const WithInteractivity: Story = {
           {
             start: startOfDay(new Date()),
             end: endOfDay(
-              addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 14)
+              addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 14),
             ),
             title: "A loong day event",
             canEdit: true,
@@ -112,22 +112,22 @@ export const WithEvents: Story = {
           {
             start: addDays(
               startOfDay(
-                startOfWeek(subWeeks(new Date(), 2), { weekStartsOn: 1 })
+                startOfWeek(subWeeks(new Date(), 2), { weekStartsOn: 1 }),
               ),
-              3
+              3,
             ),
             end: addDays(
               startOfDay(
-                startOfWeek(subWeeks(new Date(), 2), { weekStartsOn: 1 })
+                startOfWeek(subWeeks(new Date(), 2), { weekStartsOn: 1 }),
               ),
-              5
+              5,
             ),
             title: "2 days",
           },
           {
             start: startOfDay(startOfWeek(new Date(), { weekStartsOn: 1 })),
             end: endOfDay(
-              addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 15)
+              addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 15),
             ),
             title: "2 weeks",
           },
@@ -139,7 +139,7 @@ export const WithEvents: Story = {
           {
             start: startOfDay(startOfWeek(new Date(), { weekStartsOn: 1 })),
             end: endOfDay(
-              addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 2)
+              addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 2),
             ),
             title: "3 day",
             color: "blue",
@@ -148,7 +148,7 @@ export const WithEvents: Story = {
             start: addHours(startOfDay(addDays(new Date(), 2)), 5),
             end: addMinutes(
               addHours(startOfDay(addDays(new Date(), 2)), 5),
-              35
+              35,
             ),
             title: "35 min",
           },
@@ -179,6 +179,34 @@ export const WithEvents: Story = {
   },
 };
 
+export const Week: Story = {
+  args: {
+    rows: eventsToRows(
+      [
+        {
+          start: addHours(startOfDay(new Date()), 9),
+          end: addHours(startOfDay(new Date()), 17),
+          title: "All day work",
+        },
+        {
+          start: addHours(startOfDay(addDays(new Date(), 1)), 10),
+          end: addHours(startOfDay(addDays(new Date(), 1)), 11),
+          title: "1 hour meeting",
+        },
+        {
+          start: startOfDay(addDays(new Date(), 2)),
+          end: endOfDay(addDays(new Date(), 3)),
+          title: "2 day event",
+          color: "blue",
+        },
+      ],
+      "week",
+    ),
+    resolution: "week",
+    startTime: startOfWeek(new Date(), { weekStartsOn: 1 }),
+  },
+};
+
 export const Month: Story = {
   args: {
     rows: eventsToRows(
@@ -186,12 +214,12 @@ export const Month: Story = {
         {
           start: startOfDay(new Date()),
           end: endOfDay(
-            addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 14)
+            addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 14),
           ),
           title: "A loong day event",
         },
       ],
-      "month"
+      "month",
     ),
     resolution: "month",
   },
@@ -217,12 +245,12 @@ export const ThreeMonths: Story = {
         {
           start: startOfDay(new Date()),
           end: endOfDay(
-            addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 14)
+            addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 14),
           ),
           title: "A loong day event",
         },
       ],
-      "3-months"
+      "3-months",
     ),
     resolution: "3-months",
   },
@@ -234,12 +262,12 @@ export const Year: Story = {
         {
           start: startOfDay(new Date()),
           end: endOfDay(
-            addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 14)
+            addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 14),
           ),
           title: "A loong day event",
         },
       ],
-      "year"
+      "year",
     ),
     resolution: "year",
   },
@@ -251,12 +279,12 @@ export const ThreeYears: Story = {
         {
           start: startOfDay(new Date()),
           end: endOfDay(
-            addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 14)
+            addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 14),
           ),
           title: "A loong day event",
         },
       ],
-      "3-years"
+      "3-years",
     ),
     resolution: "3-years",
   },
@@ -378,7 +406,7 @@ export const NoHeader: Story = {
           noHeader
           rows={eventsToRows(
             manyEvents.map((e) => ({ ...e, color: "#4985f5" })),
-            props.resolution ?? "3-years"
+            props.resolution ?? "3-years",
           )}
         />
         <Timeline
@@ -387,7 +415,7 @@ export const NoHeader: Story = {
           noHeader
           rows={eventsToRows(
             manyEvents.map((e) => ({ ...e, color: "#718059" })),
-            props.resolution ?? "3-years"
+            props.resolution ?? "3-years",
           )}
         />
       </Box>

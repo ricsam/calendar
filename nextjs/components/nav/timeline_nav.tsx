@@ -32,6 +32,7 @@ import { ChevronLeft, ChevronRight } from "./chevrons";
  * A list of all resolutions that can be selected for the timeline
  */
 export const allResolutions: TimelineResolution[] = [
+  "week",
   "month",
   "3-months",
   "year",
@@ -55,6 +56,7 @@ const allSpeeds: TimelineSpeed[] = [
  * A list of speeds for each resolution
  */
 export const speeds: Record<TimelineResolution, TimelineSpeed[]> = {
+  week: ["day", "week"],
   month: ["week", "month"],
   "3-months": ["week", "month", "3-months"],
   year: ["quarter", "year"],
@@ -108,7 +110,7 @@ export function TimelineNav(props: {
   const setResolution = props.setResolution ?? setLocalResolution;
 
   const [localSpeed, setLocalSpeed] = React.useState<TimelineSpeed>(
-    props.speed ?? speeds[resolution][0]
+    props.speed ?? speeds[resolution][0],
   );
 
   let speed = props.speed ?? localSpeed;
@@ -136,7 +138,7 @@ export function TimelineNav(props: {
         if (resolution === "month" || resolution === "3-months") {
           return startOfWeek(
             startOfMonth(subMonths(endOfWeek(val, options), 1)),
-            options
+            options,
           );
         }
         return subMonths(val, 1);
@@ -145,7 +147,7 @@ export function TimelineNav(props: {
         if (resolution === "month" || resolution === "3-months") {
           return startOfWeek(
             startOfMonth(addMonths(endOfWeek(val, options), 1)),
-            options
+            options,
           );
         }
         return addMonths(val, 1);
@@ -196,14 +198,14 @@ export function TimelineNav(props: {
     "3-months": () =>
       `${format(endOfWeek(currentDate, options), "MMM")} – ${format(
         startOfWeek(addMonths(currentDate, 3), options),
-        "MMM"
+        "MMM",
       )}`,
     quarter: "qqq",
     year: "yyyy",
     "3-years": () =>
       `${format(currentDate, "yyyy")} – ${format(
         addYears(currentDate, 2),
-        "yyyy"
+        "yyyy",
       )}`,
   };
 
@@ -266,7 +268,9 @@ export function TimelineNav(props: {
               >
                 {allResolutions.map((value) => {
                   let title: string = value;
-                  if (value === "3-months") {
+                  if (value === "week") {
+                    title = "Week";
+                  } else if (value === "3-months") {
                     title = "Quarter";
                   } else if (value === "3-years") {
                     title = "Three years";

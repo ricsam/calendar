@@ -10,6 +10,9 @@ export const minRenderedEventDuration = (resolution: TimelineResolution) => {
   // 3-years: week
 
   let minDuration = 1000 * 3600 * 1; // month
+  if (resolution === "week") {
+    minDuration = 1000 * 3600 * 1; // 1 hour
+  }
   if (resolution === "3-months") {
     minDuration = 1000 * 3600 * 24;
   }
@@ -25,7 +28,7 @@ export const minRenderedEventDuration = (resolution: TimelineResolution) => {
 export const eventsOverlaps = (
   resolution: TimelineResolution,
   a: PartialEvent,
-  b: PartialEvent
+  b: PartialEvent,
 ) => {
   const minDuration = minRenderedEventDuration(resolution);
 
@@ -50,13 +53,13 @@ export const eventsOverlaps = (
 
 export const eventsToRows = <T extends PartialEvent>(
   events: T[],
-  resolution: TimelineResolution
+  resolution: TimelineResolution,
 ): T[][] => {
   const rows: T[][] = [[]];
   for (let j = 0; j < events.length; j++) {
     const row = rows.find((row) => {
       return !row.some((evInRow) =>
-        eventsOverlaps(resolution, events[j], evInRow)
+        eventsOverlaps(resolution, events[j], evInRow),
       );
     });
     if (row) {
