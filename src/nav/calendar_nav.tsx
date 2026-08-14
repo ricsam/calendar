@@ -91,5 +91,5 @@ function MonthYearRowDate({ date }: { date: Date }) {
 function WeekChip({ date }: { date: Date }) {
   const weekNr = format(date, "w");
 
-  return <Chip label={`Week ${weekNr}`} sx={{ width: 72, height: 32 }} />;
+  return <Chip label={`Week ${weekNr}`} sx={{ height: 32 }} />;
 }
