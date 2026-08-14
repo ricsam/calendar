@@ -5,6 +5,8 @@ Focused month and week calendar components for React and Material UI.
 [![CI](https://github.com/ricsam/calendar/actions/workflows/ci.yml/badge.svg)](https://github.com/ricsam/calendar/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/@ricsam/react-mui-calendar.svg)](https://www.npmjs.com/package/@ricsam/react-mui-calendar)
 
+[**Live demo and component playground**](https://ricsam.github.io/calendar/) · [**Documentation**](https://react-mui-calendar.mintlify.site/)
+
 ## Why this package
 
 - Controlled event state with typed callbacks
@@ -49,7 +51,7 @@ export function App() {
 }
 ```
 
-See [`docs/`](./docs) for the Mintlify guides and API reference.
+Try the components in the [live playground](https://ricsam.github.io/calendar/) or read the [Mintlify guides and API reference](https://react-mui-calendar.mintlify.site/).
 
 ## Develop
 

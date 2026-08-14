@@ -13,6 +13,8 @@ import { createDemoEvents, type DemoEvent } from "./data";
 type View = "home" | "month" | "week" | "navigation";
 
 const anchor = new Date(2026, 2, 11, 10, 20);
+const docsUrl = "https://react-mui-calendar.mintlify.site/";
+const githubUrl = "https://github.com/ricsam/calendar";
 
 export function App() {
   const [view, setView] = React.useState<View>("home");
@@ -71,13 +73,15 @@ function Header({
         ))}
       </nav>
       <div className="header-actions">
+        <a href={docsUrl}>Docs</a>
+        <a href={githubUrl}>GitHub</a>
         <button
           className="mode-toggle"
           onClick={() => setMode(mode === "light" ? "dark" : "light")}
+          aria-label={`Use ${mode === "light" ? "dark" : "light"} theme`}
         >
           {mode === "light" ? "Dark" : "Light"}
         </button>
-        <a href="https://github.com/ricsam/calendar">GitHub</a>
       </div>
     </header>
   );
@@ -88,7 +92,7 @@ function Landing({ setView }: { setView: (view: View) => void }) {
     <main>
       <section className="hero">
         <div className="hero-copy">
-          <div className="eyebrow">Open source React components</div>
+          <div className="eyebrow">Open source React + MUI components</div>
           <h1>Calendars that feel native to your product.</h1>
           <p>
             Polished month and week views built for Material UI. Bring your own
@@ -103,17 +107,13 @@ function Landing({ setView }: { setView: (view: View) => void }) {
             >
               Explore components
             </Button>
-            <Button
-              variant="outlined"
-              size="large"
-              href="https://github.com/ricsam/calendar#readme"
-            >
+            <Button variant="outlined" size="large" href={docsUrl}>
               Read the docs
             </Button>
           </div>
           <div className="install-command">
             <code>npm i @ricsam/react-mui-calendar</code>
-            <span>MIT licensed</span>
+            <span>MIT licensed · React 18/19 · MUI 5/6/7</span>
           </div>
         </div>
         <div className="hero-calendar">
@@ -194,14 +194,38 @@ function Landing({ setView }: { setView: (view: View) => void }) {
           <span>Ready for your event model</span>
           <h2>Start with the view. Own everything else.</h2>
         </div>
-        <Button
-          variant="contained"
-          size="large"
-          onClick={() => setView("month")}
-        >
-          Open component catalog
-        </Button>
+        <div className="cta-actions">
+          <Button
+            variant="contained"
+            size="large"
+            onClick={() => setView("month")}
+          >
+            Try the playground
+          </Button>
+          <Button variant="text" size="large" href={docsUrl}>
+            Read the docs
+          </Button>
+        </div>
       </section>
+
+      <footer className="site-footer">
+        <div className="footer-brand">
+          <span className="brand-mark" aria-hidden="true">
+            <span>12</span>
+          </span>
+          <div>
+            <strong>React MUI Calendar</strong>
+            <span>Focused calendars. Your product rules.</span>
+          </div>
+        </div>
+        <div className="footer-links">
+          <a href={docsUrl}>Documentation</a>
+          <a href="https://www.npmjs.com/package/@ricsam/react-mui-calendar">
+            npm
+          </a>
+          <a href={githubUrl}>GitHub</a>
+        </div>
+      </footer>
     </main>
   );
 }
@@ -240,10 +264,10 @@ function Catalog({ view }: { view: Exclude<View, "home"> }) {
               : "A controlled toolbar for moving between month and week ranges."}
         </p>
         <div className="catalog-note">
-          <strong>Try it</strong>
+          <strong>This is a live component</strong>
           <span>
-            Click an event to select it. Drag editable events or drag empty
-            space to create one.
+            Click an event to select it. Drag editable events to move or resize
+            them, or drag empty space to create one.
           </span>
         </div>
       </aside>
@@ -349,6 +373,9 @@ function CalendarPreview({
   const [time, setTime] = React.useState(anchor);
   const [events, setEvents] = React.useState(() => createDemoEvents(anchor));
   const [selected, setSelected] = React.useState<string>();
+  const [activity, setActivity] = React.useState(
+    "Select, drag, resize, or create an event",
+  );
 
   const visibleEvents = events.map((event) => ({
     ...event,
@@ -361,6 +388,8 @@ function CalendarPreview({
         item.data.id === event.data.id ? { ...item, start, end } : item,
       ),
     );
+    setSelected(event.data.id);
+    setActivity(`Updated “${event.title ?? "Untitled event"}”`);
   };
   const createEvent = (start: Date, end: Date) => {
     const id = `created-${Date.now()}`;
@@ -376,14 +405,35 @@ function CalendarPreview({
       },
     ]);
     setSelected(id);
+    setActivity("Created “New event”");
   };
-  const clickEvent = (event: CalendarEvent<{ data: { id: string } }>) =>
+  const clickEvent = (event: CalendarEvent<{ data: { id: string } }>) => {
     setSelected(event.data.id);
+    setActivity(`Selected “${event.title ?? "Untitled event"}”`);
+  };
+  const resetDemo = () => {
+    setTime(anchor);
+    setEvents(createDemoEvents(anchor));
+    setSelected(undefined);
+    setActivity("Demo reset — try another interaction");
+  };
 
   return (
     <div className={`calendar-demo ${type} ${compact ? "compact" : ""}`}>
       {!compact && (
-        <CalendarNav type={type} now={anchor} time={time} setTime={setTime} />
+        <>
+          <div className="demo-status" aria-live="polite">
+            <span>
+              <i aria-hidden="true" />
+              <strong>Live demo</strong>
+              {activity}
+            </span>
+            <Button size="small" variant="text" onClick={resetDemo}>
+              Reset
+            </Button>
+          </div>
+          <CalendarNav type={type} now={anchor} time={time} setTime={setTime} />
+        </>
       )}
       <Box
         sx={{

@@ -44,8 +44,8 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Component demo",
-          "href": "https://github.com/ricsam/calendar",
+          "anchor": "Live playground",
+          "href": "https://ricsam.github.io/calendar/",
           "icon": "calendar-days"
         }
       ]
@@ -64,8 +64,8 @@
     ],
     "primary": {
       "type": "button",
-      "label": "Open demo",
-      "href": "https://github.com/ricsam/calendar"
+      "label": "Open playground",
+      "href": "https://ricsam.github.io/calendar/"
     }
   },
   "contextual": {
