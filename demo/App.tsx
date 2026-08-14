@@ -21,7 +21,7 @@ export function App() {
   return (
     <CalendarThemeProvider theme={mode}>
       <CssBaseline />
-      <div className="site-shell">
+      <div className={`site-shell ${mode === "dark" ? "dark-mode" : ""}`}>
         <Header view={view} setView={setView} mode={mode} setMode={setMode} />
         {view === "home" ? (
           <Landing setView={setView} />

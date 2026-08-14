@@ -1,4 +1,20 @@
-import "./mui";
+import type { CSSProperties } from "react";
+
+declare module "@mui/material/styles" {
+  interface TypographyVariants {
+    event: CSSProperties;
+  }
+
+  interface TypographyVariantsOptions {
+    event?: CSSProperties;
+  }
+}
+
+declare module "@mui/material/Typography" {
+  interface TypographyPropsVariantOverrides {
+    event: true;
+  }
+}
 
 export { MonthCalendar } from "./month_calendar/month_calendar";
 export type { MonthCalendarProps } from "./month_calendar/month_calendar";
