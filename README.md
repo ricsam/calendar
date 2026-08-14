@@ -62,15 +62,17 @@ npm run build
 npm run docs:dev  # Mintlify preview
 ```
 
-## Publish
+## Release with Changesets
 
-The `Publish package` GitHub Action publishes tags matching `v*` using npm trusted publishing (OIDC), Node 24, and npm 11+. Configure the npm trusted publisher with:
+Add a changeset with every consumer-facing change:
 
-- GitHub owner: `ricsam`
-- Repository: `calendar`
-- Workflow filename: `publish.yml`
+```bash
+npm run changeset
+```
 
-No long-lived npm token is used by the workflow. The package version must match the release tag before it is pushed.
+The `Publish package` workflow runs on `main`. When pending changesets exist it creates or updates a **Version Packages** pull request containing version and changelog updates. Merging that pull request publishes the package and creates the release tag through npm trusted publishing.
+
+The trusted publisher is configured for `ricsam/calendar` and `publish.yml`; no long-lived npm token is used. GitHub Actions needs permission to create pull requests under **Settings → Actions → General**.
 
 ## Scope
 
