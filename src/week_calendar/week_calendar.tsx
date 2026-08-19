@@ -29,6 +29,7 @@ import {
 } from "date-fns";
 import React from "react";
 import { DEFAULT_COLOR, isAllDayEvent, mergeSx, widthToPct } from "../helpers";
+import { MoreEventsButton } from "../more_events_button";
 import { CalendarEvent, ScrollContainer, StartDay } from "../types";
 import {
   DragPosition,
@@ -245,6 +246,11 @@ export function WeekCalendar<T>(props: WeekCalendarProps<T>) {
               flex: `0 0 min(${headerContentHeight}px, 50%)`,
               overflow: "hidden",
               minHeight: 0,
+              // The header draws a bottom divider and the grid draws its
+              // midnight divider. Pull the scroll area up by exactly that 1px
+              // so the two lines overlap instead of stacking into a double
+              // border.
+              marginBottom: "-1px",
             }}
           >
             <WeekCalendarHeader
@@ -483,7 +489,6 @@ function WeekCalendarHeader<T>(props: {
           position: "sticky",
           top: 0,
           zIndex: 1,
-          marginBottom: "-1px",
           background: (theme) => theme.palette.background.paper,
         },
       )}
@@ -739,31 +744,24 @@ function WeekCalendarHeader<T>(props: {
             })}
           </Box>
 
-          {/* "+N more" expand links, one per day column with hidden events */}
+          {/* "N more" expand links, one per day column with hidden events */}
           {!isExpanded &&
             [...Array(daysInWeek)].map((_, index) => {
               if (hiddenPerDay[index] === 0) return null;
               return (
-                <Button
+                <MoreEventsButton
                   key={index}
-                  size="small"
-                  variant="text"
+                  className="more-events-button"
+                  numHiddenEvents={hiddenPerDay[index]}
                   onClick={() => setIsExpanded(true)}
                   sx={{
                     position: "absolute",
                     top: 64 + effectiveHeight,
+                    // same column geometry as the all-day pills above it
                     left: widthToPct(index * 120 + 1, daysInWeek),
-                    width: widthToPct(119, daysInWeek),
-                    fontSize: "0.7rem",
-                    p: 0,
-                    minWidth: "auto",
-                    textTransform: "none",
-                    lineHeight: 1,
-                    justifyContent: "flex-start",
+                    width: widthToPct(119 - 8, daysInWeek),
                   }}
-                >
-                  +{hiddenPerDay[index]} more
-                </Button>
+                />
               );
             })}
         </Box>

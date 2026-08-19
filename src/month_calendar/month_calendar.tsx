@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  ButtonProps,
   Divider,
   Paper,
   Typography,
@@ -41,6 +40,7 @@ import {
   mergeSx,
   widthToPct,
 } from "../helpers";
+import { MoreEventsButton } from "../more_events_button";
 import { CalendarEvent, ScrollContainer, StartDay } from "../types";
 import {
   DragPosition,
@@ -653,7 +653,6 @@ export function MonthCalendar<T>(props: MonthCalendarProps<T>) {
                             week * 120,
                             weeksInMonth,
                           )} + ${row * (16 + 1) + 1 + 32}px)`,
-                          height: "16px",
                           position: "absolute",
                           zIndex: 2,
                         }}
@@ -1003,49 +1002,6 @@ function WeekIndicator({
         </Typography>
       </FlexCol>
     </FlexCol>
-  );
-}
-
-function MoreEventsButton({
-  numHiddenEvents,
-  ...buttonProps
-}: {
-  numHiddenEvents: number;
-} & ButtonProps) {
-  return (
-    <Button
-      variant="text"
-      {...buttonProps}
-      sx={mergeSx(
-        {
-          justifyContent: "flex-start",
-          m: 0,
-          py: "0px",
-          px: "5px",
-          width: "117px",
-          height: "16px",
-          position: "absolute",
-          bottom: "1px",
-          borderRadius: "4px",
-          overflow: "hidden",
-          minWidth: "auto",
-          whiteSpace: "nowrap",
-        },
-        buttonProps.sx,
-      )}
-    >
-      <Typography
-        sx={{
-          color: "var(--Light-Primary-Dark, #1565C0)",
-          textTransform: "none",
-          fontFamily: "Roboto",
-          fontSize: "10px",
-          fontStyle: "normal",
-          fontWeight: 500,
-          lineHeight: "100%",
-        }}
-      >{`${numHiddenEvents} more`}</Typography>
-    </Button>
   );
 }
 
