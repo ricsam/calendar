@@ -847,6 +847,7 @@ function TimeSidebar() {
             key={index + hour}
             sx={{
               height: "60px",
+              flexShrink: 0,
               alignSelf: "center",
               justifyContent: "center",
             }}
@@ -866,6 +867,7 @@ function TimeSidebar() {
             key={index + hour}
             sx={{
               height: "60px",
+              flexShrink: 0,
               alignSelf: "center",
               justifyContent: "center",
             }}
