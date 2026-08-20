@@ -1,6 +1,6 @@
 {
   "name": "@ricsam/react-mui-calendar",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Accessible, themeable month and week calendar components for React and Material UI.",
   "keywords": [
     "react",
