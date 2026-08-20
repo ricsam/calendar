@@ -1,4 +1,5 @@
 import { Box, Button, Chip, CssBaseline } from "@mui/material";
+import { HeadContent, Link, Outlet } from "@tanstack/react-router";
 import { addHours } from "date-fns";
 import React from "react";
 import {
@@ -9,67 +10,61 @@ import {
   type CalendarEvent,
 } from "../src";
 import { createDemoEvents, type DemoEvent } from "./data";
+import { ButtonLink } from "./links";
 
-type View = "home" | "month" | "week" | "navigation";
+export type CatalogView = "month" | "week" | "navigation";
 
 const anchor = new Date(2026, 2, 11, 10, 20);
 const docsUrl = "https://react-mui-calendar.mintlify.site/";
 const githubUrl = "https://github.com/ricsam/calendar";
 
-export function App() {
-  const [view, setView] = React.useState<View>("home");
+export function RootLayout() {
   const [mode, setMode] = React.useState<"light" | "dark">("light");
 
   return (
     <CalendarThemeProvider theme={mode}>
+      <HeadContent />
       <CssBaseline />
       <div className={`site-shell ${mode === "dark" ? "dark-mode" : ""}`}>
-        <Header view={view} setView={setView} mode={mode} setMode={setMode} />
-        {view === "home" ? (
-          <Landing setView={setView} />
-        ) : (
-          <Catalog view={view} />
-        )}
+        <Header mode={mode} setMode={setMode} />
+        <Outlet />
       </div>
     </CalendarThemeProvider>
   );
 }
 
 function Header({
-  view,
-  setView,
   mode,
   setMode,
 }: {
-  view: View;
-  setView: (view: View) => void;
   mode: "light" | "dark";
   setMode: (mode: "light" | "dark") => void;
 }) {
-  const links: Array<{ label: string; view: View }> = [
-    { label: "Overview", view: "home" },
-    { label: "Month", view: "month" },
-    { label: "Week", view: "week" },
-    { label: "Navigation", view: "navigation" },
-  ];
+  const links = [
+    { label: "Overview", to: "/", exact: true },
+    { label: "Month", to: "/month", exact: false },
+    { label: "Week", to: "/week", exact: false },
+    { label: "Navigation", to: "/navigation", exact: false },
+  ] as const;
 
   return (
     <header className="topbar">
-      <button className="brand" onClick={() => setView("home")}>
+      <Link className="brand" to="/">
         <span className="brand-mark">
           <span>12</span>
         </span>
         <span>React MUI Calendar</span>
-      </button>
+      </Link>
       <nav className="main-nav" aria-label="Demo navigation">
         {links.map((link) => (
-          <button
-            className={view === link.view ? "active" : undefined}
-            key={link.view}
-            onClick={() => setView(link.view)}
+          <Link
+            activeOptions={{ exact: link.exact }}
+            activeProps={{ className: "active" }}
+            key={link.to}
+            to={link.to}
           >
             {link.label}
-          </button>
+          </Link>
         ))}
       </nav>
       <div className="header-actions">
@@ -87,7 +82,28 @@ function Header({
   );
 }
 
-function Landing({ setView }: { setView: (view: View) => void }) {
+export function NotFound() {
+  return (
+    <main className="not-found">
+      <span className="eyebrow">404</span>
+      <h1>This page is not on the calendar.</h1>
+      <p>
+        The address might have moved or picked up an extra segment. Try one of
+        the live component demos instead.
+      </p>
+      <div className="hero-actions">
+        <ButtonLink variant="contained" size="large" to="/">
+          Back to overview
+        </ButtonLink>
+        <ButtonLink variant="outlined" size="large" to="/week">
+          Week calendar
+        </ButtonLink>
+      </div>
+    </main>
+  );
+}
+
+export function Landing() {
   return (
     <main>
       <section className="hero">
@@ -100,13 +116,9 @@ function Landing({ setView }: { setView: (view: View) => void }) {
             platform along for the ride.
           </p>
           <div className="hero-actions">
-            <Button
-              variant="contained"
-              size="large"
-              onClick={() => setView("month")}
-            >
+            <ButtonLink variant="contained" size="large" to="/month">
               Explore components
-            </Button>
+            </ButtonLink>
             <Button variant="outlined" size="large" href={docsUrl}>
               Read the docs
             </Button>
@@ -160,7 +172,7 @@ function Landing({ setView }: { setView: (view: View) => void }) {
           </p>
         </div>
         <div className="showcase-grid">
-          <button className="showcase-card" onClick={() => setView("month")}>
+          <Link className="showcase-card" to="/month">
             <div className="showcase-copy">
               <Chip label="MonthCalendar" size="small" />
               <h3>See the whole plan.</h3>
@@ -172,8 +184,8 @@ function Landing({ setView }: { setView: (view: View) => void }) {
             <div className="showcase-preview month">
               <CalendarPreview type="month" compact />
             </div>
-          </button>
-          <button className="showcase-card" onClick={() => setView("week")}>
+          </Link>
+          <Link className="showcase-card" to="/week">
             <div className="showcase-copy">
               <Chip label="WeekCalendar" size="small" />
               <h3>Work at day-level detail.</h3>
@@ -185,7 +197,7 @@ function Landing({ setView }: { setView: (view: View) => void }) {
             <div className="showcase-preview week">
               <CalendarPreview type="week" compact />
             </div>
-          </button>
+          </Link>
         </div>
       </section>
 
@@ -195,13 +207,9 @@ function Landing({ setView }: { setView: (view: View) => void }) {
           <h2>Start with the view. Own everything else.</h2>
         </div>
         <div className="cta-actions">
-          <Button
-            variant="contained"
-            size="large"
-            onClick={() => setView("month")}
-          >
+          <ButtonLink variant="contained" size="large" to="/month">
             Try the playground
-          </Button>
+          </ButtonLink>
           <Button variant="text" size="large" href={docsUrl}>
             Read the docs
           </Button>
@@ -244,7 +252,7 @@ function Feature({
   );
 }
 
-function Catalog({ view }: { view: Exclude<View, "home"> }) {
+export function Catalog({ view }: { view: CatalogView }) {
   return (
     <main className="catalog">
       <aside className="catalog-aside">

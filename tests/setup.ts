@@ -12,3 +12,11 @@ if (typeof globalThis.ResizeObserver === "undefined") {
     disconnect() {}
   };
 }
+
+/**
+ * jsdom does not implement `window.scrollTo`, which the demo router's scroll
+ * restoration calls on every navigation. Stub it so routing tests stay quiet.
+ */
+if (typeof window !== "undefined") {
+  window.scrollTo = () => {};
+}

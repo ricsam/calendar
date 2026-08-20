@@ -64,6 +64,18 @@ npm run build
 npm run docs:dev  # Mintlify preview
 ```
 
+### Demo routing on GitHub Pages
+
+The demo is a single-page app routed with [TanStack Router](https://tanstack.com/router), so `/calendar/`, `/calendar/month`, `/calendar/week`, and `/calendar/navigation` are all real, shareable, bookmarkable URLs.
+
+GitHub Pages serves static files only — it has no rewrite or SPA-fallback configuration — so `npm run build:demo` handles deep links at build time:
+
+- The router's `basepath` comes from `import.meta.env.BASE_URL`, which is `/calendar/` on GitHub Pages (the deploy workflow passes `--base`) and `/` locally, so routes, links, and assets share one prefix.
+- A small Vite plugin in `vite.config.ts` copies the built `index.html` shell to `month.html`, `week.html`, and `navigation.html`, so those extensionless URLs return **200** instead of a 404 status.
+- The same shell is written to `404.html`, the only catch-all hook Pages exposes, so any other path still boots the app and renders the in-app not-found screen.
+
+Add new routes in `demo/router.tsx` and list their paths in `demo/route-paths.ts` so the build pre-renders an entry point for them. `tests/demo-routing.test.tsx` guards both halves of that contract.
+
 ## Release with Changesets
 
 Add a changeset with every consumer-facing change:
