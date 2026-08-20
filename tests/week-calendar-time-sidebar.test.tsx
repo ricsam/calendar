@@ -13,14 +13,13 @@ function renderWeek(props: { stickyHeader?: boolean } = {}) {
 }
 
 /**
- * The hour labels are laid out in a flex column next to a 1440px tall grid
- * (1px per minute). Each hour cell must keep its full 60px so that every label
- * stays aligned with the hour line it belongs to.
+ * The grid is 1440px tall at 1px per minute, so the 1px line for a given hour
+ * is drawn from `hour * 60px`. Each label is absolutely positioned on the
+ * middle of that line (+0.5px) and centred on it with translateY(-50%), which
+ * keeps it aligned regardless of font metrics or the surrounding flex parent.
  *
- * When the sidebar is placed in a shorter flex parent (for example the sticky
- * header layout, where the scroll container is smaller than 1440px), the
- * default `flex-shrink: 1` lets the cells collapse. The labels then drift out
- * of the visible range and stop matching the grid rows.
+ * Stacking fixed-height cells instead made the labels depend on the column
+ * never shrinking, and left them a couple of pixels above their lines.
  */
 describe("WeekCalendar time sidebar", () => {
   const hours = [
@@ -48,14 +47,28 @@ describe("WeekCalendar time sidebar", () => {
   it.each([
     ["default layout", {}],
     ["sticky header layout", { stickyHeader: true }],
-  ])("keeps each hour cell at a full 60px in the %s", (_name, props) => {
+  ])("centres each hour label on its grid line in the %s", (_name, props) => {
     const { unmount } = renderWeek(props);
 
+    const expectedTop: Record<string, string> = {
+      "1 AM": "60.5px",
+      "6 AM": "360.5px",
+      "11 AM": "660.5px",
+      "12 PM": "720.5px",
+      "1 PM": "780.5px",
+      "6 PM": "1080.5px",
+      "11 PM": "1380.5px",
+    };
+
     for (const hour of hours) {
-      const cell = screen.getByText(hour).parentElement;
-      expect(cell).not.toBeNull();
-      // A shrinking cell is what broke label/grid-line alignment.
-      expect(cell).toHaveStyle({ height: "60px", flexShrink: "0" });
+      const label = screen.getByText(hour).parentElement;
+      expect(label).not.toBeNull();
+      expect(label).toHaveStyle({
+        position: "absolute",
+        top: expectedTop[hour],
+        // centring on the line is what keeps the label aligned with it
+        transform: "translateY(-50%)",
+      });
     }
 
     unmount();

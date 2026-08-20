@@ -9,12 +9,17 @@ import { mergeSx } from "./helpers";
  *
  * Positioning is left to the caller, the sizing here matches a single event
  * row (16px tall).
+ *
+ * Pass `numHiddenEvents` for the usual "n more" label, or `label` to render
+ * another action (for example "Show less") with identical styling.
  */
 export function MoreEventsButton({
   numHiddenEvents,
+  label,
   ...buttonProps
 }: {
-  numHiddenEvents: number;
+  numHiddenEvents?: number;
+  label?: string;
 } & ButtonProps) {
   return (
     <Button
@@ -45,7 +50,9 @@ export function MoreEventsButton({
           fontWeight: 500,
           lineHeight: "100%",
         }}
-      >{`${numHiddenEvents} more`}</Typography>
+      >
+        {label ?? `${numHiddenEvents} more`}
+      </Typography>
     </Button>
   );
 }

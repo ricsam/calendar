@@ -1,12 +1,4 @@
-import { ChevronDown, ChevronUp } from "../nav/chevrons";
-import {
-  Box,
-  Button,
-  Divider,
-  IconButton,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Box, Button, Divider, Typography, useTheme } from "@mui/material";
 import {
   StartOfWeekOptions,
   addDays,
@@ -48,6 +40,18 @@ import { getAllDayOverlaps } from "./event_overlap_functions";
 import { subDayEventSize } from "./sub_day_event_size";
 import { TimeIndicator } from "./time_indicator";
 import { ModifiableEvent } from "./types";
+
+/**
+ * The grid is laid out at 1px per minute, so an hour is 60px and a full day is
+ * 1440px tall.
+ */
+const MINUTES_PER_HOUR = 60;
+const MINUTES_PER_DAY = 24 * MINUTES_PER_HOUR;
+/**
+ * Hour lines are 1px tall and drawn with their top edge on the hour, so the
+ * middle of the line sits half a pixel further down.
+ */
+const HOUR_LINE_THICKNESS = 1;
 
 export type WeekCalendarProps<T> = {
   /**
@@ -216,7 +220,8 @@ export function WeekCalendar<T>(props: WeekCalendarProps<T>) {
   const collapsedHeight = 17 * COLLAPSED_ROWS;
   const hasOverflow = maxOverlaps > COLLAPSED_ROWS;
   const effectiveIsExpanded = isExpanded && hasOverflow;
-  const MORE_BUTTON_HEIGHT = hasOverflow && !effectiveIsExpanded ? 20 : 0;
+  // Space for the "n more" link, or for "Show less" once expanded.
+  const MORE_BUTTON_HEIGHT = hasOverflow ? 20 : 0;
   const effectiveHeight = effectiveIsExpanded
     ? totalHeight
     : Math.min(totalHeight, collapsedHeight);
@@ -246,11 +251,6 @@ export function WeekCalendar<T>(props: WeekCalendarProps<T>) {
               flex: `0 0 min(${headerContentHeight}px, 50%)`,
               overflow: "hidden",
               minHeight: 0,
-              // The header draws a bottom divider and the grid draws its
-              // midnight divider. Pull the scroll area up by exactly that 1px
-              // so the two lines overlap instead of stacking into a double
-              // border.
-              marginBottom: "-1px",
             }}
           >
             <WeekCalendarHeader
@@ -379,7 +379,8 @@ function WeekCalendarHeader<T>(props: {
   const isExpanded = (props.isExpanded ?? isExpandedInternal) && hasOverflow;
   const setIsExpanded = props.setIsExpanded ?? setIsExpandedInternal;
 
-  const MORE_BUTTON_HEIGHT = hasOverflow && !isExpanded ? 20 : 0;
+  // Space for the "n more" link, or for "Show less" once expanded.
+  const MORE_BUTTON_HEIGHT = hasOverflow ? 20 : 0;
 
   const effectiveHeight = isExpanded
     ? totalHeight
@@ -495,33 +496,7 @@ function WeekCalendarHeader<T>(props: {
     >
       <FlexRow sx={props.sticky ? { height: "100%" } : undefined}>
         {/* Left gutter — same 64px width as TimeSidebar */}
-        <Box
-          sx={{
-            width: 64,
-            flexShrink: 0,
-            display: "flex",
-            alignItems: "flex-end",
-            pb: 0.5,
-            pl: 0.5,
-          }}
-        >
-          {hasOverflow && (
-            <IconButton
-              size="small"
-              onClick={() => setIsExpanded((v) => !v)}
-              aria-label={
-                isExpanded ? "Collapse all-day events" : "Expand all-day events"
-              }
-              aria-expanded={isExpanded}
-            >
-              {isExpanded ? (
-                <ChevronUp width={16} height={16} />
-              ) : (
-                <ChevronDown width={16} height={16} />
-              )}
-            </IconButton>
-          )}
-        </Box>
+        <Box sx={{ width: 64, flexShrink: 0 }} />
 
         <Box
           sx={mergeSx(
@@ -535,9 +510,6 @@ function WeekCalendarHeader<T>(props: {
               height: "100%",
               scrollbarGutter: "stable",
               background: (theme) => theme.palette.background.paper,
-              borderBottomColor: (theme) => theme.palette.divider,
-              borderBottomStyle: "solid",
-              borderBottomWidth: "thin",
             },
           )}
           ref={eventContainerRef}
@@ -580,11 +552,11 @@ function WeekCalendarHeader<T>(props: {
               top: 64,
               height:
                 isExpanded && props.sticky
-                  ? "calc(100% - 64px)"
+                  ? `calc(100% - ${64 + MORE_BUTTON_HEIGHT}px)`
                   : effectiveHeight,
               maxHeight:
                 isExpanded && props.sticky
-                  ? "calc(100% - 64px)"
+                  ? `calc(100% - ${64 + MORE_BUTTON_HEIGHT}px)`
                   : effectiveHeight,
               overflowY: isExpanded ? "auto" : "hidden",
             }}
@@ -754,6 +726,7 @@ function WeekCalendarHeader<T>(props: {
                   className="more-events-button"
                   numHiddenEvents={hiddenPerDay[index]}
                   onClick={() => setIsExpanded(true)}
+                  aria-expanded={false}
                   sx={{
                     position: "absolute",
                     top: 64 + effectiveHeight,
@@ -764,6 +737,24 @@ function WeekCalendarHeader<T>(props: {
                 />
               );
             })}
+
+          {/* Collapse the expanded all-day area again */}
+          {isExpanded && (
+            <MoreEventsButton
+              className="more-events-button"
+              label="Show less"
+              onClick={() => setIsExpanded(false)}
+              aria-expanded
+              sx={{
+                position: "absolute",
+                ...(props.sticky
+                  ? { bottom: 0 }
+                  : { top: 64 + effectiveHeight }),
+                left: widthToPct(1, daysInWeek),
+                width: widthToPct(119 - 8, daysInWeek),
+              }}
+            />
+          )}
         </Box>
       </FlexRow>
     </FlexCol>
@@ -829,55 +820,60 @@ function DayHeader({ date, active }: { date: Date; active?: boolean }) {
   );
 }
 
+/**
+ * The hour label column next to the 1440px grid (1px per minute).
+ *
+ * Each label is absolutely positioned on the hour it belongs to and centred on
+ * that line with translateY(-50%). Stacking fixed-height cells instead would
+ * make the labels depend on font metrics and on the column never shrinking,
+ * which is what previously left them a couple of pixels above their lines.
+ *
+ * Midnight has no label by design, so the column starts at 1 AM.
+ */
 function TimeSidebar() {
+  const hours = Array.from({ length: 23 }, (_, i) => i + 1);
+
+  const formatHour = (hour: number) => {
+    if (hour === 12) return "12 PM";
+    return hour < 12 ? `${hour} AM` : `${hour - 12} PM`;
+  };
+
   return (
-    <FlexCol
+    <Box
+      className="time-sidebar"
       sx={{
         width: "64px",
-        padding: "29px 24px 0px 0px",
-        alignItems: "center",
+        height: MINUTES_PER_DAY,
         flexShrink: 0,
+        position: "relative",
       }}
     >
-      {[...Array.from({ length: 12 }, (_, i) => i + 1)].map((hour, index) => {
-        return (
-          <FlexCol
-            key={index + hour}
-            sx={{
-              height: "60px",
-              flexShrink: 0,
-              alignSelf: "center",
-              justifyContent: "center",
-            }}
+      {hours.map((hour) => (
+        <Box
+          key={hour}
+          className="time-sidebar-label"
+          sx={{
+            position: "absolute",
+            left: 0,
+            // keeps the 24px gap between the label and the grid
+            right: "24px",
+            // centre of the hour line, which is drawn from hour * 60px
+            top: `${hour * MINUTES_PER_HOUR + HOUR_LINE_THICKNESS / 2}px`,
+            transform: "translateY(-50%)",
+            display: "flex",
+            justifyContent: "center",
+            lineHeight: 1,
+          }}
+        >
+          <Typography
+            variant="caption"
+            sx={{ color: (theme) => theme.palette.text.primary }}
           >
-            <Typography
-              variant="caption"
-              sx={{ color: (theme) => theme.palette.text.primary }}
-            >
-              {hour === 12 ? `${hour} PM` : `${hour} AM`}
-            </Typography>
-          </FlexCol>
-        );
-      })}
-      {[...Array.from({ length: 11 }, (_, i) => i + 1)].map((hour, index) => {
-        return (
-          <FlexCol
-            key={index + hour}
-            sx={{
-              height: "60px",
-              flexShrink: 0,
-              alignSelf: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Typography
-              variant="caption"
-              sx={{ color: (theme) => theme.palette.text.primary }}
-            >{`${hour} PM`}</Typography>
-          </FlexCol>
-        );
-      })}
-    </FlexCol>
+            {formatHour(hour)}
+          </Typography>
+        </Box>
+      ))}
+    </Box>
   );
 }
 
@@ -1111,7 +1107,7 @@ function WeekCalendarGrid<T>(props: {
       sx={{
         position: "relative",
         width: "100%",
-        height: 1440,
+        height: MINUTES_PER_DAY,
       }}
     >
       {/* Horizontal lines */}
